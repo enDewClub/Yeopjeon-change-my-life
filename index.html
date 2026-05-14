@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>조선시대 농사 게임 (제목 미정)</title>
+
+        <!-- CSS 파일 (변수 먼저, 스타일 다음) -->
+        <link rel="stylesheet" href="css/tokens.css" />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <!-- ═══════════════════════════════════════════════
+         게임 컨테이너: 모든 씬을 담는 박스 (가운데 정렬)
+         ═══════════════════════════════════════════════ -->
+        <div id="game-container">
+            <!-- ═══════════════════════════════════════════
+             씬 1: 타이틀 화면
+             ═══════════════════════════════════════════ -->
+            <div id="scene-title" class="scene active">
+                <h1 class="title-text">엽전 하나로 바뀐 내 인생</h1>
+                <p class="title-tagline">열심히 일해서 궁궐에 들어가겠다</p>
+                <button id="btn-game-start" class="btn-primary">
+                    시작하기
+                </button>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+             씬 2: 게임 화면 (소지금 + 맵 + 인벤토리)
+             ═══════════════════════════════════════════ -->
+            <div id="scene-game" class="scene">
+                <!-- 상단: 소지금 표시 -->
+                <div id="money-display">
+                    소지금: <span id="money-amount">100</span>푼
+                </div>
+
+                <!-- 가운데: 맵 영역 (배경 + 출구버튼 + 상호작용요소) -->
+                <div id="map-area">
+                    <!-- 맵 배경 이미지 (JS의 renderMap에서 src 설정) -->
+                    <img id="map-bg" src="" alt="" />
+
+                    <!-- 맵 상호작용 요소 (밭, 채집식물 등 - Step1+ 에서 사용) -->
+                    <div id="map-interactables"></div>
+
+                    <!-- 출구 버튼들 (JS에서 동적 생성) -->
+                    <div id="map-exits"></div>
+                </div>
+
+                <!-- 하단: 인벤토리 바 (2줄 x 10칸 = 총 20칸) -->
+                <div id="inventory-bar"></div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+             씬 3: 엔딩 화면
+             ═══════════════════════════════════════════ -->
+            <div id="scene-ending" class="scene">
+                <p id="ending-text">
+                    궁궐에 입장하자마자 꽃길이 펼쳐지며,<br />
+                    신비한 힘에 의해 다시 현대로 돌아갔다...
+                </p>
+                <button id="btn-restart" class="btn-primary">다시하기</button>
+            </div>
+        </div>
+        <!-- /game-container -->
+
+        <!-- ═══════════════════════════════════════════
+         스크립트 로드 (순서 중요 - 의존성 순서대로)
+         ═══════════════════════════════════════════ -->
+        <script src="js/data.js"></script>
+        <script src="js/state.js"></script>
+        <script src="js/ui.js"></script>
+        <script src="js/map.js"></script>
+        <script src="js/game.js"></script>
+    </body>
+</html>

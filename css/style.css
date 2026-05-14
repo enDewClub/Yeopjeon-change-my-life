@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════════
+   style.css - 게임 메인 스타일
+   tokens.css 의 변수를 사용해서 실제 스타일을 정의한다.
+   ═══════════════════════════════════════════════════════ */
+
+
+/* ═══ Reset & 기본 ═══ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* 게임을 뷰포트 가운데 정렬 */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-frame);
+    font-family: var(--font-family);
+    color: var(--text-primary);
+}
+
+
+/* ═══════════════════════════════════════════════
+   게임 컨테이너 - 모든 씬을 담는 박스
+   ═══════════════════════════════════════════════ */
+/* 너비/높이 고정 = 960 x (48 + 540 + 140) = 960 x 728 */
+#game-container {
+    width: var(--canvas-width);
+    height: calc(
+        var(--money-bar-height)
+        + var(--canvas-height)
+        + var(--inventory-bar-height)
+    );
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+}
+
+
+/* ═══════════════════════════════════════════════
+   씬 (Scene) - 화면 전환
+   기본은 숨김, .active 클래스 추가하면 보임
+   ═══════════════════════════════════════════════ */
+.scene {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.scene.active {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ═══════════════════════════════════════════════
+   씬 1: 타이틀 화면
+   ═══════════════════════════════════════════════ */
+#scene-title {
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-6);
+    background-color: var(--primary-50);
+    padding: var(--spacing-12);
+}
+
+.title-text {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-900);
+    text-align: center;
+}
+
+.title-tagline {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+
+/* ═══════════════════════════════════════════════
+   씬 2: 게임 화면 - 상단(소지금) / 맵 / 하단(인벤토리)
+   ═══════════════════════════════════════════════ */
+
+/* --- 상단: 소지금 바 --- */
+#money-display {
+    height: var(--money-bar-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 var(--spacing-6);
+    background-color: var(--neutral-100);
+    border-bottom: 1px solid var(--border-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+}
+
+#money-amount {
+    color: var(--secondary-700);
+    font-weight: var(--font-weight-bold);
+    margin: 0 var(--spacing-1);
+}
+
+
+/* --- 가운데: 맵 영역 --- */
+#map-area {
+    width: 100%;
+    height: var(--canvas-height);
+    flex-shrink: 0;
+    position: relative;
+    background-color: var(--neutral-200);  /* 배경 이미지 로드 전 임시 색 */
+    overflow: hidden;
+}
+
+/* 맵 배경 이미지 - 맵 영역 전체를 채움 */
+#map-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* 맵 상호작용 요소 (밭, 채집식물 등) - 절대 위치 */
+#map-interactables {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;  /* 자식 요소만 클릭 가능하게 */
+}
+
+#map-interactables > * {
+    pointer-events: auto;
+}
+
+/* 출구 버튼 컨테이너 - 맵 영역 전체에 깔림 */
+#map-exits {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 출구 버튼 (공통) - 맵 가장자리에 위치 */
+.exit-btn {
+    position: absolute;
+    width: var(--exit-button-width);
+    height: var(--exit-button-height);
+    background-color: var(--button-exit-bg);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--button-exit-text);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color 0.15s;
+}
+
+.exit-btn:hover {
+    background-color: var(--button-exit-hover);
+}
+
+/* 출구 버튼 위치별 클래스 */
+.exit-btn-left {
+    left: var(--spacing-4);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.exit-btn-right {
+    right: var(--spacing-4);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.exit-btn-top {
+    top: var(--spacing-4);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.exit-btn-bottom {
+    bottom: var(--spacing-4);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* --- 하단: 인벤토리 바 (2줄 x 10칸) --- */
+#inventory-bar {
+    height: var(--inventory-bar-height);
+    flex-shrink: 0;
+    padding: var(--inventory-padding);
+    background-color: var(--neutral-100);
+    border-top: 1px solid var(--border-primary);
+    display: grid;
+    grid-template-columns: repeat(10, var(--inventory-slot-size));
+    grid-template-rows: repeat(2, var(--inventory-slot-size));
+    gap: var(--inventory-slot-gap);
+    justify-content: center;
+    align-content: center;
+}
+
+/* 인벤토리 칸 1개 - 아이콘과 갯수를 담는 박스 */
+.inventory-slot {
+    width: var(--inventory-slot-size);
+    height: var(--inventory-slot-size);
+    background-color: var(--neutral-0);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    position: relative;
+}
+
+/* 인벤토리 아이콘 - 칸 가운데에 표시 */
+.inventory-slot-icon {
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* 인벤토리 갯수 표시 - 칸 오른쪽 아래 */
+.inventory-slot-count {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+
+/* ═══════════════════════════════════════════════
+   씬 3: 엔딩 화면
+   ═══════════════════════════════════════════════ */
+#scene-ending {
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-8);
+    background-color: var(--neutral-50);
+    padding: var(--spacing-12);
+}
+
+#ending-text {
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.8;
+}
+
+
+/* ═══════════════════════════════════════════════
+   공통 버튼 - 메인 액션 버튼 (시작, 다시하기 등)
+   ═══════════════════════════════════════════════ */
+.btn-primary {
+    padding: var(--spacing-3) var(--spacing-6);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: none;
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.05s;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    background-color: var(--button-primary-hover);
+    color: var(--text-inverse);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
