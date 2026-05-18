@@ -20,6 +20,7 @@
  */
 function startNewGame() {
     switchScene("title");
+    STATE.inventory = new Inventory(10);
 }
 
 /**
@@ -41,9 +42,35 @@ window.addEventListener("DOMContentLoaded", () => {
     // 타이틀의 "시작하기" 버튼
     $("btn-game-start").addEventListener("click", onTitleStart);
 
+    // ═══════════════════════════════════════════════
+    // 인벤토리 클릭 핸들러 (이벤트 위임 패턴)
+    // ═══════════════════════════════════════════════
+    // #inventory-bar 에 한 번만 리스너 붙임 → 안의 어떤 슬롯을 클릭해도 동작.
+    // 슬롯마다 따로 리스너를 붙이지 않아서 효율적이고, renderInventory
+    // 가 슬롯을 다시 만들어도 리스너 재등록 필요 없음.
+    $("inventory-bar").addEventListener("click", (event) => {
+        // 클릭된 요소에서 가장 가까운 .inventory-slot 찾기
+        const slotEl = event.target.closest(".inventory-slot");
+        if (!slotEl) return; // 슬롯이 아닌 곳 클릭한 거면 무시
+
+        const index = Number(slotEl.dataset.slotIndex);
+
+        // 빈 슬롯 클릭은 무시 (선택할 게 없음)
+        if (STATE.inventory.slots[index] === null) return;
+
+        STATE.inventory.selectSlot(index);
+
+        // 화면 다시 그리기 (선택 표시 + 메시지 갱신)
+        renderInventory();
+        renderSelectedItemMessage();
+    });
+
     // 엔딩의 "다시하기" 버튼
     $("btn-restart").addEventListener("click", startNewGame);
 
     // 게임 시작!
     startNewGame();
+    renderMoney();
+    renderInventory();
+    renderSelectedItemMessage();
 });

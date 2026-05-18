@@ -53,13 +53,14 @@ function renderMoney() {
 
 /**
  * 인벤토리 전체를 다시 그린다.
- * STATE.inventory 배열의 각 슬롯마다 div 하나씩 생성해서 #inventory-bar 에 붙임.
+ * STATE.inventory.slots 의 각 슬롯마다 div 하나씩 생성.
+ * 선택된 슬롯에는 .selected 클래스 추가.
  */
 function renderInventory() {
     const bar = $("inventory-bar");
     bar.innerHTML = ""; // 기존 슬롯 모두 지우기
 
-    STATE.inventory.forEach((slot, index) => {
+    STATE.inventory.slots.forEach((slot, index) => {
         bar.appendChild(createSlotElement(slot, index));
     });
 }
@@ -73,7 +74,12 @@ function renderInventory() {
  */
 function createSlotElement(slot, index) {
     const slotEl = document.createElement("div");
+
     slotEl.className = "inventory-slot";
+    // 현재 선택된 슬롯이면 .selected 클래스 추가 (CSS 에서 시각적 강조)
+    if (index === STATE.inventory.selectedSlotIndex) {
+        slotEl.classList.add("selected");
+    }
     slotEl.dataset.slotIndex = index; // 나중에 클릭 핸들러에서 활용
 
     // 빈 칸이면 그대로 반환
@@ -94,4 +100,22 @@ function createSlotElement(slot, index) {
     slotEl.appendChild(count);
 
     return slotEl;
+}
+// ═══════════════════════════════════════════════
+// 선택된 아이템 메시지 표시
+// ═══════════════════════════════════════════════
+
+/**
+ * 현재 선택된 아이템 이름을 메시지 영역에 표시한다.
+ * 선택된 게 없거나 빈 슬롯이면 메시지 영역을 비운다.
+ */
+function renderSelectedItemMessage() {
+    const item = STATE.inventory.getSelectedItem();
+    const messageEl = $("message-area");
+
+    if (item === null) {
+        messageEl.textContent = "";
+    } else {
+        messageEl.textContent = `현재 선택한 아이템: ${item.displayName}`;
+    }
 }

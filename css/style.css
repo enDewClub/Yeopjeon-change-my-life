@@ -3,7 +3,6 @@
    tokens.css 의 변수를 사용해서 실제 스타일을 정의한다.
    ═══════════════════════════════════════════════════════ */
 
-
 /* ═══ Reset & 기본 ═══ */
 * {
     margin: 0;
@@ -22,7 +21,6 @@ body {
     color: var(--text-primary);
 }
 
-
 /* ═══════════════════════════════════════════════
    게임 컨테이너 - 모든 씬을 담는 박스
    ═══════════════════════════════════════════════ */
@@ -30,9 +28,8 @@ body {
 #game-container {
     width: var(--canvas-width);
     height: calc(
-        var(--money-bar-height)
-        + var(--canvas-height)
-        + var(--inventory-bar-height)
+        var(--money-bar-height) + var(--canvas-height) +
+            var(--inventory-bar-height) + var(--message-area-height)
     );
     background-color: var(--bg-primary);
     border-radius: var(--radius-lg);
@@ -40,7 +37,6 @@ body {
     overflow: hidden;
     position: relative;
 }
-
 
 /* ═══════════════════════════════════════════════
    씬 (Scene) - 화면 전환
@@ -56,7 +52,6 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 
 /* ═══════════════════════════════════════════════
    씬 1: 타이틀 화면
@@ -82,7 +77,6 @@ body {
     text-align: center;
 }
 
-
 /* ═══════════════════════════════════════════════
    씬 2: 게임 화면 - 상단(소지금) / 맵 / 하단(인벤토리)
    ═══════════════════════════════════════════════ */
@@ -107,14 +101,13 @@ body {
     margin: 0 var(--spacing-1);
 }
 
-
 /* --- 가운데: 맵 영역 --- */
 #map-area {
     width: 100%;
     height: var(--canvas-height);
     flex-shrink: 0;
     position: relative;
-    background-color: var(--neutral-200);  /* 배경 이미지 로드 전 임시 색 */
+    background-color: var(--neutral-200); /* 배경 이미지 로드 전 임시 색 */
     overflow: hidden;
 }
 
@@ -134,7 +127,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none;  /* 자식 요소만 클릭 가능하게 */
+    pointer-events: none; /* 자식 요소만 클릭 가능하게 */
 }
 
 #map-interactables > * {
@@ -197,7 +190,6 @@ body {
     transform: translateX(-50%);
 }
 
-
 /* --- 하단: 인벤토리 바 (2줄 x 10칸) --- */
 #inventory-bar {
     height: var(--inventory-bar-height);
@@ -245,6 +237,11 @@ body {
     color: var(--text-primary);
 }
 
+/* 선택된 인벤토리 슬롯 - 굵은 컬러 테두리로 강조 */
+.inventory-slot.selected {
+    outline: 3px solid var(--primary-500);
+    outline-offset: -3px;
+}
 
 /* ═══════════════════════════════════════════════
    씬 3: 엔딩 화면
@@ -264,7 +261,6 @@ body {
     line-height: 1.8;
 }
 
-
 /* ═══════════════════════════════════════════════
    공통 버튼 - 메인 액션 버튼 (시작, 다시하기 등)
    ═══════════════════════════════════════════════ */
@@ -278,7 +274,9 @@ body {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
-    transition: background-color 0.15s, transform 0.05s;
+    transition:
+        background-color 0.15s,
+        transform 0.05s;
     box-shadow: var(--shadow-md);
 }
 
@@ -289,4 +287,18 @@ body {
 
 .btn-primary:active {
     transform: translateY(1px);
+}
+
+/* --- 메시지 영역: 선택된 아이템 표시 (맵과 인벤토리 사이) --- */
+#message-area {
+    height: var(--message-area-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-4);
+    background-color: var(--bg-frame);
+    border-top: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
 }

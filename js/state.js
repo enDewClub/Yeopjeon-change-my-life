@@ -18,7 +18,7 @@ const STATE = {
     currentScene: "title", // 현재 씬: "title" | "game" | "ending"
     currentMap: null, // 현재 맵 ID (게임 중일 때만, 아니면 null)
     money: 0, // 현재 소지금 (푼)
-    inventory: [], // 인벤토리 슬롯 배열
+    inventory: null, // Inventory 인스턴스 (resetGameState 에서 생성)
     // 각 슬롯: null (빈 칸) 또는 { itemId, count }
 };
 
@@ -34,15 +34,12 @@ const STATE = {
 function resetGameState() {
     STATE.currentMap = DATA.CONFIG.STARTING_MAP;
     STATE.money = DATA.CONFIG.STARTING_MONEY;
-    STATE.inventory = createEmptyInventory();
-}
 
-/**
- * 빈 인벤토리 배열을 만들어서 반환한다.
- * 길이는 DATA.CONFIG.INVENTORY_SIZE (=20).
- * 모든 슬롯은 null (빈 칸). 아이템 들어오면 { itemId, count } 로 바뀜.
- */
-function createEmptyInventory() {
-    // new Array(N).fill(null) → 길이 N 짜리, 전부 null 인 배열
-    return new Array(DATA.CONFIG.INVENTORY_SIZE).fill(null);
+    // 새 인벤토리 생성 (이전 인벤토리는 가비지 컬렉터가 알아서 정리)
+    STATE.inventory = new Inventory(DATA.CONFIG.INVENTORY_SIZE);
+
+    // 시작 아이템 채우기
+    DATA.CONFIG.STARTING_INVENTORY.forEach(({ itemId, count }) => {
+        STATE.inventory.addItem(itemId, count);
+    });
 }

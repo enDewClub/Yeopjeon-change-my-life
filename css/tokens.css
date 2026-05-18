@@ -7,103 +7,94 @@
 /* 한국어 폰트 - 나중에 게임 분위기에 맞게 변경 가능 */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap");
 
-
 :root {
-
     /* ═══ 1. 원시 색상 (Primitive Colors) ═══ */
 
     /* Primary (Green) - 메인 색상 */
-    --primary-50:  #F4FBE6;
-    --primary-100: #E8F6CC;
-    --primary-300: #BCEB5D;
-    --primary-500: #8ED402;  /* Main */
-    --primary-700: #72AA02;
+    --primary-50: #f4fbe6;
+    --primary-100: #e8f6cc;
+    --primary-300: #bceb5d;
+    --primary-500: #8ed402; /* Main */
+    --primary-700: #72aa02;
     --primary-900: #395501;
 
     /* Secondary (Orange) - 보조 색상 */
-    --secondary-100: #FCE6CC;
-    --secondary-500: #FB770B;
-    --secondary-700: #C2410C;
+    --secondary-100: #fce6cc;
+    --secondary-500: #fb770b;
+    --secondary-700: #c2410c;
 
     /* Neutral (Gray) - 중성 색상 */
-    --neutral-0:   #FFFFFF;
-    --neutral-50:  #F5F6F5;
-    --neutral-100: #ECECEB;
-    --neutral-200: #D9DAD7;
-    --neutral-500: #9FA29A;
-    --neutral-700: #5F615C;
-    --neutral-900: #20201F;
-
+    --neutral-0: #ffffff;
+    --neutral-50: #f5f6f5;
+    --neutral-100: #ececeb;
+    --neutral-200: #d9dad7;
+    --neutral-500: #9fa29a;
+    --neutral-700: #5f615c;
+    --neutral-900: #20201f;
 
     /* ═══ 2. 의미 색상 (Semantic Colors) ═══ */
     /* 용도별로 의미를 부여한 색상. 컴포넌트에서는 이걸 쓴다. */
 
-    --text-primary:   var(--neutral-900);
+    --text-primary: var(--neutral-900);
     --text-secondary: var(--neutral-700);
-    --text-inverse:   var(--neutral-50);
+    --text-inverse: var(--neutral-50);
 
-    --bg-frame:     #F3EDE0;             /* 게임 외곽 배경 (조선시대 종이 느낌) */
-    --bg-primary:   var(--neutral-50);
+    --bg-frame: #f3ede0; /* 게임 외곽 배경 (조선시대 종이 느낌) */
+    --bg-primary: var(--neutral-50);
     --bg-secondary: var(--neutral-100);
 
-    --border-primary:   var(--neutral-200);
+    --border-primary: var(--neutral-200);
     --border-secondary: var(--neutral-500);
-
 
     /* ═══ 3. 버튼 색상 ═══ */
 
     /* 메인 버튼 (시작하기, 다시하기 등) */
-    --button-primary-bg:    var(--primary-500);
+    --button-primary-bg: var(--primary-500);
     --button-primary-hover: var(--primary-700);
-    --button-primary-text:  var(--neutral-900);
+    --button-primary-text: var(--neutral-900);
 
     /* 출구 버튼 (맵 가장자리) - 반투명 흰색 */
-    --button-exit-bg:    rgba(255, 255, 255, 0.85);
+    --button-exit-bg: rgba(255, 255, 255, 0.85);
     --button-exit-hover: var(--primary-100);
-    --button-exit-text:  var(--neutral-900);
-
+    --button-exit-text: var(--neutral-900);
 
     /* ═══ 4. 간격 (Spacing) - 4px 단위 ═══ */
-    --spacing-1:  4px;
-    --spacing-2:  8px;
-    --spacing-3:  12px;
-    --spacing-4:  16px;
-    --spacing-6:  24px;
-    --spacing-8:  32px;
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
     --spacing-12: 48px;
-
 
     /* ═══ 5. 폰트 ═══ */
     --font-family: "Noto Sans KR", sans-serif;
 
-    --font-size-sm:    14px;
-    --font-size-base:  16px;
-    --font-size-lg:    18px;
-    --font-size-h3:    24px;
-    --font-size-h2:    30px;
-    --font-size-h1:    36px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-h3: 24px;
+    --font-size-h2: 30px;
+    --font-size-h1: 36px;
 
-    --font-weight-base:   400;
+    --font-weight-base: 400;
     --font-weight-medium: 500;
-    --font-weight-bold:   700;
-
+    --font-weight-bold: 700;
 
     /* ═══ 6. 모서리 (Border Radius) ═══ */
-    --radius-sm:   4px;
+    --radius-sm: 4px;
     --radius-base: 8px;
-    --radius-lg:   12px;
+    --radius-lg: 12px;
     --radius-full: 9999px;
-
 
     /* ═══ 7. 그림자 (Shadow) ═══ */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-
     /* ═══ 8. 게임 전용 토큰 ═══ */
     /* 맵 영역 크기 (캔버스 사이즈) */
-    --canvas-width:  960px;
+    --canvas-width: 960px;
     --canvas-height: 540px;
 
     /* 상단 소지금 바 */
@@ -111,12 +102,14 @@
 
     /* 하단 인벤토리 바 (2줄 x 10칸) */
     --inventory-slot-size: 56px;
-    --inventory-slot-gap:  6px;
-    --inventory-padding:   12px;
-    --inventory-bar-height: 140px;  /* 56*2 + gap + padding */
+    --inventory-slot-gap: 6px;
+    --inventory-padding: 12px;
+    --inventory-bar-height: 140px; /* 56*2 + gap + padding */
 
     /* 출구 버튼 크기 */
-    --exit-button-width:  100px;
+    --exit-button-width: 100px;
     --exit-button-height: 60px;
 
+    /* 메시지 영역 (선택된 아이템 표시) */
+    --message-area-height: 32px;
 }
