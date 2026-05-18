@@ -65,6 +65,9 @@ window.addEventListener("DOMContentLoaded", () => {
         renderSelectedItemMessage();
     });
 
+    // 상점의 "나가기" 버튼
+    $("btn-leave-store").addEventListener("click", onLeaveStore);
+
     // 엔딩의 "다시하기" 버튼
     $("btn-restart").addEventListener("click", startNewGame);
 

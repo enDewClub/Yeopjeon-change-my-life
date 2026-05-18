@@ -112,6 +112,10 @@ function handleSpecialAction(actionType) {
         case "goEnding":
             switchScene("ending");
             break;
+        case "goStore":
+            switchScene("store");
+            enterStore();
+            break;
         // 미래에 추가될 수 있는 것들:
         // case "openInventoryMenu": ...
         // case "talkToNpc": ...

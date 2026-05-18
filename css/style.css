@@ -302,3 +302,119 @@ body {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
 }
+
+/* ═══════════════════════════════════════════════
+   씬 4: 상점 화면
+   ═══════════════════════════════════════════════ */
+
+#scene-store {
+    background-color: var(--bg-frame);
+}
+
+/* --- 상단 바: 소지금 + 나가기 --- */
+#store-top-bar {
+    height: var(--money-bar-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-6);
+    background-color: var(--neutral-100);
+    border-bottom: 1px solid var(--border-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+}
+
+#store-money-amount {
+    color: var(--secondary-700);
+    font-weight: var(--font-weight-bold);
+    margin: 0 var(--spacing-1);
+}
+
+#btn-leave-store {
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: var(--neutral-0);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+}
+
+#btn-leave-store:hover {
+    background-color: var(--primary-100);
+}
+
+/* --- 본문: 왼쪽(NPC) + 오른쪽(구매/판매) --- */
+#store-body {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+#store-npc-area {
+    flex: 1;
+    background-color: var(--neutral-50);
+    border-right: 1px solid var(--border-primary);
+}
+
+#store-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 구매/판매 섹션 (각각 위/아래 절반) */
+.store-section {
+    flex: 1;
+    padding: var(--spacing-4);
+    overflow-y: auto;
+}
+
+.store-section + .store-section {
+    border-top: 1px solid var(--border-primary);
+}
+
+.store-section h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-3);
+    color: var(--text-primary);
+}
+
+/* 아이템 목록 컨테이너 (구매/판매 공통) */
+#store-buy-section,
+#store-sell-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+/* 아이템 버튼 (팀원이 만들 버튼들의 공통 스타일) */
+.store-item-button {
+    width: 80px;
+    height: 100px;
+    padding: var(--spacing-2);
+    background-color: var(--neutral-0);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+}
+
+.store-item-button:hover {
+    background-color: var(--primary-50);
+    border-color: var(--primary-500);
+}
+
+.store-item-button img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}

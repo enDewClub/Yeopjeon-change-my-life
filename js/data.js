@@ -113,8 +113,12 @@ const DATA = {
             displayName: "마을 중심",
             bgImage: "img_assets/bg/village.png",
             exits: {
-                right: "home", // 오른쪽 → 집터
-                left: "palace", // 왼쪽 → 궁궐
+                right: "home",
+                left: "palace",
+            },
+            specialAction: {
+                label: "상점 들어가기",
+                actionType: "goStore",
             },
         },
 

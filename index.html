@@ -63,6 +63,38 @@
                 </p>
                 <button id="btn-restart" class="btn-primary">다시하기</button>
             </div>
+
+            <!-- ═══════════════════════════════════════════
+                씬 4: 상점 화면
+                ═══════════════════════════════════════════ -->
+            <div id="scene-store" class="scene">
+                <!-- 상단: 소지금 + 나가기 버튼 -->
+                <div id="store-top-bar">
+                    <span
+                        >소지금:
+                        <span id="store-money-amount">100</span>푼</span
+                    >
+                    <button id="btn-leave-store">상점 나가기</button>
+                </div>
+
+                <!-- 본문: NPC 왼쪽, 구매/판매 오른쪽 -->
+                <div id="store-body">
+                    <!-- 왼쪽: NPC 영역 (지금은 비어있음, 나중에 캐릭터 추가) -->
+                    <div id="store-npc-area"></div>
+
+                    <!-- 오른쪽: 구매/판매 (상하 분할) -->
+                    <div id="store-content">
+                        <section class="store-section">
+                            <h3>구매목록</h3>
+                            <div id="store-buy-section"></div>
+                        </section>
+                        <section class="store-section">
+                            <h3>판매목록</h3>
+                            <div id="store-sell-section"></div>
+                        </section>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- /game-container -->
 
@@ -75,5 +107,6 @@
         <script src="js/ui.js"></script>
         <script src="js/map.js"></script>
         <script src="js/game.js"></script>
+        <script src="js/store.js"></script>
     </body>
 </html>
