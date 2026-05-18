@@ -40,7 +40,7 @@ js/
   game.js               ← 메인 로직, 이벤트 연결           [Step 0-6]
   farm.js               ← 농사 로직                       [Step 1]
   shop.js               ← 상점 로직                       [Step 1]
-assets/
+img_assets/
   bg/                   ← 맵 배경 이미지
   items/                ← 아이템 아이콘
   sprites/              ← 캐릭터 스프라이트                [Step 3]
@@ -144,7 +144,7 @@ DEV_GUIDE.md            ← 이 문서
 ### 새 맵 추가하기
 
 1. `data.js` → `DATA.MAPS` 에 새 객체 추가 (`displayName`, `bgImage`, `exits`)
-2. `assets/bg/` 에 배경 이미지 파일 넣기
+2. `img_assets/bg/` 에 배경 이미지 파일 넣기
 3. 다른 맵의 `exits` 에 이 맵으로 가는 연결 추가
 4. **이 문서의 파일 구조 / 단계 표 업데이트**
 
@@ -153,7 +153,7 @@ DEV_GUIDE.md            ← 이 문서
 ### 새 아이템 추가하기 [Step 1+]
 
 1. `data.js` → `DATA.ITEMS` 에 새 객체 추가
-2. `assets/items/` 에 아이콘 파일 넣기
+2. `img_assets/items/` 에 아이콘 파일 넣기
 
 ### 시작 소지금 바꾸기
 

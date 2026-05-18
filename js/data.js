@@ -28,18 +28,18 @@
 //   })
 //
 // 파일 경로 규칙 (현재 farm 카테고리 기준):
-//   icon              → img_img_assets/items/farm/{id}.png
-//   growthStages.bud  → img_img_assets/items/farm/{growsInto}_bud.png
+//   icon              → img_assets/items/farm/{id}.png
+//   growthStages.bud  → img_assets/items/farm/{growsInto}_bud.png
 //   growthStages.growing/ready 도 동일 패턴
 //
 // 규칙에서 벗어나는 아이템은 def 에 직접 필드 넣으면 자동값을 덮어씀.
-//   예: { ..., icon: "img_img_assets/items/special/magic_book.png" }
+//   예: { ..., icon: "img_assets/items/special/magic_book.png" }
 // ═══════════════════════════════════════════════════════
 function defineItems({ seeds = {}, crops = {}, folder = "farm" }) {
     const items = {};
 
     // 경로 생성 단축 함수
-    const path = (name) => `img_img_assets/items/${folder}/${name}.png`;
+    const path = (name) => `img_assets/items/${folder}/${name}.png`;
 
     // ─── 씨앗 처리 ──────────────────────────
     for (const [id, def] of Object.entries(seeds)) {
@@ -154,7 +154,7 @@ const DATA = {
     //   - id, icon, type, growthStages 는 헬퍼가 ID 와 규칙으로 자동 생성
     //
     // 새 아이템 추가 = 해당 카테고리에 한 줄 추가하면 끝.
-    // 이미지 파일은 규칙대로 img_img_assets/items/farm/{id}.png 위치에 두기.
+    // 이미지 파일은 규칙대로 img_assets/items/farm/{id}.png 위치에 두기.
     //
     // 필드 설명:
     //   displayName  : 화면 표시 이름 (한글)
