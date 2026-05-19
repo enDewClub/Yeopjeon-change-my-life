@@ -34,12 +34,16 @@ class Field {
 
     /**
      * 씨앗을 심는다. empty → planted
+     * 인벤토리 차감은 호출자가 처리 (Inventory 와 같은 패턴).
      * @param {string} seedId
-     * @returns {boolean} 성공 여부
+     * @returns {boolean} 성공 여부 (이미 심긴 상태 등이면 false)
      */
     plant(seedId) {
-        // TODO Phase 1
-        return false;
+        if (this.state !== "empty") return false;
+
+        this.state = "planted";
+        this.seedId = seedId;
+        return true;
     }
 
     /**

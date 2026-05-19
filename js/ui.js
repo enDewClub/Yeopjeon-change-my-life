@@ -144,13 +144,29 @@ function renderField() {
     waterBtn.textContent = "물주기";
     container.appendChild(waterBtn);
 
-    // 3. 3x3 밭 그리드 (중앙) — Phase 1 에서 핸들러 연결
+    // 3. 3x3 밭 그리드 (중앙) — 상태에 따라 셀 내용 달라짐
     const grid = document.createElement("div");
     grid.id = "field-grid";
+
+    const field = STATE.field;
+
     for (let i = 0; i < DATA.CONFIG.FIELD.GRID_SIZE; i++) {
         const cell = document.createElement("div");
         cell.className = "field-cell";
         cell.dataset.cellIndex = i;
+
+        // planted 상태 → 씨앗 아이콘 표시 (9칸 모두 동일)
+        if (field.state === "planted") {
+            const img = document.createElement("img");
+            img.src = DATA.ITEMS[field.seedId].icon;
+            img.alt = DATA.ITEMS[field.seedId].displayName;
+            img.className = "field-cell-icon";
+            cell.appendChild(img);
+        }
+
+        // TODO Phase 2: growing 상태 → 새싹 이미지 (growthStages.growing)
+        // TODO Phase 3: ready 상태 → 다 자란 이미지 (growthStages.ready)
+
         grid.appendChild(cell);
     }
     container.appendChild(grid);

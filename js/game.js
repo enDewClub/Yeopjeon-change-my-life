@@ -64,9 +64,41 @@ window.addEventListener("DOMContentLoaded", () => {
         renderInventory();
         renderSelectedItemMessage();
     });
+    // ═══════════════════════════════════════════════
+    // 밭 클릭 핸들러 (이벤트 위임 패턴 - 인벤토리와 동일)
+    // ═══════════════════════════════════════════════
+    // #map-interactables 에 한 번만 리스너 → 안의 .field-cell 클릭 시 동작.
+    // renderField 가 셀을 재생성해도 리스너 재등록 필요 없음.
+    $("map-interactables").addEventListener("click", (event) => {
+        // 밭 셀 클릭인지 확인
+        const cell = event.target.closest(".field-cell");
+        if (!cell) return; // 셀이 아닌 곳 클릭은 무시
+
+        // 인벤토리에서 선택된 아이템 확인
+        const selectedItem = STATE.inventory.getSelectedItem();
+
+        // 씨앗 선택 안 됐으면 무시 (Phase 4 에서 안내 메시지 가능)
+        if (!selectedItem || selectedItem.type !== "seed") return;
+
+        // 밭에 심기 시도 (empty 가 아니면 false 반환)
+        const success = STATE.field.plant(selectedItem.id);
+        if (!success) return;
+
+        // 성공 → 인벤토리에서 씨앗 1개 차감 + 선택 해제
+        STATE.inventory.removeItem(selectedItem.id, 1);
+        STATE.inventory.deselectSlot();
+
+        // 화면 다시 그리기
+        renderInventory();
+        renderField();
+
+        // 메시지 영역에 심기 완료 알림
+        $("message-area").textContent =
+            `심기 완료: ${selectedItem.displayName}`;
+    });
 
     // 상점의 "나가기" 버튼
-    $("btn-leave-store").addEventListener("click", onLeaveStore);
+    // $("btn-leave-store").addEventListener("click", onLeaveStore);
 
     // 엔딩의 "다시하기" 버튼
     $("btn-restart").addEventListener("click", startNewGame);

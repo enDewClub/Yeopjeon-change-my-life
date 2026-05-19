@@ -218,3 +218,12 @@ const DATA = {
         },
     }),
 };
+
+// DATA.ITEMS = {
+//     potato_seed: { id, type: "seed", icon, growthStages, displayName, ... },
+//     garlic_seed: { ... },
+//     tomato_seed: { ... },
+//     potato:      { id, type: "crop", icon, displayName, ... },
+//     garlic:      { ... },
+//     tomato:      { ... },
+// }
