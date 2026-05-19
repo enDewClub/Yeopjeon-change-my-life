@@ -418,3 +418,97 @@ body {
     height: 40px;
     object-fit: contain;
 }
+
+/* ═══════════════════════════════════════════════
+   밭 맵 UI (#map-interactables 안에 동적 생성됨)
+   ═══════════════════════════════════════════════ */
+
+/* --- 타이머 (상단 중앙) — Phase 2 에서 활성화 --- */
+#field-timer {
+    position: absolute;
+    top: var(--spacing-4);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+/* 빈 문자열일 땐 숨김 (Phase 2 에서 텍스트 채우면 자동으로 보임) */
+#field-timer:empty {
+    display: none;
+}
+
+/* --- 물주기 버튼 (상단 우측) --- */
+#btn-water {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: var(--primary-500);
+    color: var(--neutral-900);
+    border: none;
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+#btn-water:hover {
+    background-color: var(--primary-700);
+    color: var(--text-inverse);
+}
+
+/* --- 3x3 밭 그리드 (중앙) --- */
+#field-grid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: var(--spacing-1);
+}
+
+.field-cell {
+    width: 100px;
+    height: 100px;
+    background-color: rgba(120, 80, 40, 0.5); /* 흙 느낌 */
+    border: 2px solid var(--neutral-900);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.field-cell:hover {
+    background-color: rgba(120, 80, 40, 0.75);
+}
+
+/* --- 수확하기 버튼 (우하단) --- */
+#btn-harvest {
+    position: absolute;
+    bottom: var(--spacing-4);
+    right: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-6);
+    background-color: var(--secondary-500);
+    color: var(--neutral-900);
+    border: none;
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background-color 0.15s;
+    box-shadow: var(--shadow-md);
+}
+
+#btn-harvest:hover {
+    background-color: var(--secondary-700);
+    color: var(--text-inverse);
+}

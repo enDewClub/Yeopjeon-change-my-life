@@ -29,7 +29,9 @@ function renderMap(mapId) {
     renderMapButtons(map);
 
     // 3. 상호작용 요소 초기화 (Step 1+ 에서 밭/채집식물 등 채울 곳)
+    // (renderField 가 내부에서 clear + 재렌더 처리. 밭 맵이 아니면 자동으로 비움)
     $("map-interactables").innerHTML = "";
+    renderField();
 }
 
 // ═══════════════════════════════════════════════

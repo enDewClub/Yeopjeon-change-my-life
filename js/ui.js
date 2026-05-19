@@ -119,3 +119,45 @@ function renderSelectedItemMessage() {
         messageEl.textContent = `현재 선택한 아이템: ${item.displayName}`;
     }
 }
+// ═══════════════════════════════════════════════
+// 밭 렌더링 (3x3 그리드 + 타이머 + 버튼들)
+// 밭 맵에서만 그림. STATE.field.state 에 따라 내용 달라짐.
+// ═══════════════════════════════════════════════
+
+function renderField() {
+    const container = $("map-interactables");
+
+    // 밭 맵이 아니면 아무것도 안 그림
+    if (STATE.currentMap !== "field") return;
+
+    container.innerHTML = ""; // 잔여물 제거 (재호출 시 중복 방지)
+
+    // 1. 타이머 (상단 중앙) — Phase 2 에서 채워짐
+    const timer = document.createElement("div");
+    timer.id = "field-timer";
+    timer.textContent = ""; // 빈 문자열 → CSS :empty 로 숨김
+    container.appendChild(timer);
+
+    // 2. 물주기 버튼 (상단 우측) — Phase 2 에서 핸들러 연결
+    const waterBtn = document.createElement("button");
+    waterBtn.id = "btn-water";
+    waterBtn.textContent = "물주기";
+    container.appendChild(waterBtn);
+
+    // 3. 3x3 밭 그리드 (중앙) — Phase 1 에서 핸들러 연결
+    const grid = document.createElement("div");
+    grid.id = "field-grid";
+    for (let i = 0; i < DATA.CONFIG.FIELD.GRID_SIZE; i++) {
+        const cell = document.createElement("div");
+        cell.className = "field-cell";
+        cell.dataset.cellIndex = i;
+        grid.appendChild(cell);
+    }
+    container.appendChild(grid);
+
+    // 4. 수확하기 버튼 (우하단) — Phase 3 에서 핸들러 연결
+    const harvestBtn = document.createElement("button");
+    harvestBtn.id = "btn-harvest";
+    harvestBtn.textContent = "수확하기";
+    container.appendChild(harvestBtn);
+}

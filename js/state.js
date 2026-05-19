@@ -20,6 +20,7 @@ const STATE = {
     money: 0, // 현재 소지금 (푼)
     inventory: null, // Inventory 인스턴스 (resetGameState 에서 생성)
     // 각 슬롯: null (빈 칸) 또는 { itemId, count }
+    field: null,
 };
 
 // ═══════════════════════════════════════════════
@@ -42,4 +43,7 @@ function resetGameState() {
     DATA.CONFIG.STARTING_INVENTORY.forEach(({ itemId, count }) => {
         STATE.inventory.addItem(itemId, count);
     });
+
+    //  새 밭 인스턴스 생성
+    STATE.field = new Field();
 }

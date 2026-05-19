@@ -84,6 +84,13 @@ const DATA = {
             { itemId: "garlic_seed", count: 2 },
             { itemId: "tomato_seed", count: 1 },
         ],
+        // 밭 설정값
+        FIELD: {
+            GRID_SIZE: 9, // 시각 표현용 (3x3)
+            GROW_TIME_SECONDS: 5, // 자라는 데 걸리는 시간
+            HARVEST_MIN: 1, // 수확량 최소
+            HARVEST_MAX: 9, // 수확량 최대
+        },
     },
 
     // ═══════════════════════════════════════════════
