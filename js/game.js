@@ -64,37 +64,57 @@ window.addEventListener("DOMContentLoaded", () => {
         renderInventory();
         renderSelectedItemMessage();
     });
-    // ═══════════════════════════════════════════════
-    // 밭 클릭 핸들러 (이벤트 위임 패턴 - 인벤토리와 동일)
-    // ═══════════════════════════════════════════════
-    // #map-interactables 에 한 번만 리스너 → 안의 .field-cell 클릭 시 동작.
-    // renderField 가 셀을 재생성해도 리스너 재등록 필요 없음.
-    $("map-interactables").addEventListener("click", (event) => {
-        // 밭 셀 클릭인지 확인
-        const cell = event.target.closest(".field-cell");
-        if (!cell) return; // 셀이 아닌 곳 클릭은 무시
 
-        // 인벤토리에서 선택된 아이템 확인
+    // ═══════════════════════════════════════════════
+    // 밭 관련 클릭 핸들러들 (디스패처에서 호출)
+    // ═══════════════════════════════════════════════
+
+    /**
+     * 밭 셀 클릭 → 선택된 씨앗을 심는다.
+     */
+    function onFieldCellClick() {
         const selectedItem = STATE.inventory.getSelectedItem();
-
-        // 씨앗 선택 안 됐으면 무시 (Phase 4 에서 안내 메시지 가능)
         if (!selectedItem || selectedItem.type !== "seed") return;
 
-        // 밭에 심기 시도 (empty 가 아니면 false 반환)
         const success = STATE.field.plant(selectedItem.id);
         if (!success) return;
 
-        // 성공 → 인벤토리에서 씨앗 1개 차감 + 선택 해제
         STATE.inventory.removeItem(selectedItem.id, 1);
         STATE.inventory.deselectSlot();
 
-        // 화면 다시 그리기
         renderInventory();
         renderField();
-
-        // 메시지 영역에 심기 완료 알림
         $("message-area").textContent =
             `심기 완료: ${selectedItem.displayName}`;
+    }
+
+    /**
+     * 물주기 버튼 클릭 → 성장 시작.
+     */
+    function onWaterClick() {
+        const success = STATE.field.water();
+        if (!success) return; // planted 상태가 아니면 무시
+
+        renderField();
+        $("message-area").textContent = ""; // 이전 메시지 지움, 타이머가 시각적 피드백
+    }
+
+    // ═══════════════════════════════════════════════
+    // 밭 영역 클릭 디스패처 (이벤트 위임)
+    // #map-interactables 안의 어떤 요소를 눌렀는지 확인 후 적절한 핸들러로 분기
+    // ═══════════════════════════════════════════════
+    $("map-interactables").addEventListener("click", (event) => {
+        // 밭 셀 클릭 → 심기 시도
+        if (event.target.closest(".field-cell")) {
+            onFieldCellClick();
+            return;
+        }
+        // 물주기 버튼 클릭
+        if (event.target.id === "btn-water") {
+            onWaterClick();
+            return;
+        }
+        // TODO Phase 3: btn-harvest
     });
 
     // 상점의 "나가기" 버튼
@@ -108,4 +128,28 @@ window.addEventListener("DOMContentLoaded", () => {
     renderMoney();
     renderInventory();
     renderSelectedItemMessage();
+
+    // ═══════════════════════════════════════════════
+    // 밭 성장 틱 (0.5초마다)
+    // - growing 상태면 시간 체크 후 ready 로 자동 전환
+    // - 타이머 숫자만 가볍게 업데이트 (전체 리렌더 X)
+    // ═══════════════════════════════════════════════
+    setInterval(() => {
+        const field = STATE.field;
+        if (!field || field.state !== "growing") return;
+
+        const justReady = field.checkGrowth();
+
+        if (justReady) {
+            // 성장 완료 → 전체 리렌더 + 알림 메시지
+            renderField();
+            const cropId = DATA.ITEMS[field.seedId].growsInto;
+            const cropName = DATA.ITEMS[cropId].displayName;
+            $("message-area").textContent = `${cropName}이(가) 다 자랐습니다!`;
+        } else {
+            // 아직 자라는 중 → 타이머 숫자만 업데이트 (밭 맵일 때만 존재)
+            const timer = $("field-timer");
+            if (timer) timer.textContent = `${field.getRemainingTime()}초`;
+        }
+    }, 500);
 });

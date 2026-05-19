@@ -131,11 +131,13 @@ function renderField() {
     if (STATE.currentMap !== "field") return;
 
     container.innerHTML = ""; // 잔여물 제거 (재호출 시 중복 방지)
+    const field = STATE.field;
 
-    // 1. 타이머 (상단 중앙) — Phase 2 에서 채워짐
+    // 1. 타이머 (상단 중앙) — growing 일 때만 텍스트 표시 (:empty CSS 로 자동 숨김)
     const timer = document.createElement("div");
     timer.id = "field-timer";
-    timer.textContent = ""; // 빈 문자열 → CSS :empty 로 숨김
+    const remaining = field.getRemainingTime();
+    timer.textContent = remaining !== null ? `${remaining}초` : "";
     container.appendChild(timer);
 
     // 2. 물주기 버튼 (상단 우측) — Phase 2 에서 핸들러 연결
@@ -148,18 +150,25 @@ function renderField() {
     const grid = document.createElement("div");
     grid.id = "field-grid";
 
-    const field = STATE.field;
-
     for (let i = 0; i < DATA.CONFIG.FIELD.GRID_SIZE; i++) {
         const cell = document.createElement("div");
         cell.className = "field-cell";
         cell.dataset.cellIndex = i;
 
-        // planted 상태 → 씨앗 아이콘 표시 (9칸 모두 동일)
+        // 상태별로 셀에 표시할 이미지 결정
+        let imageSrc = null;
         if (field.state === "planted") {
+            imageSrc = DATA.ITEMS[field.seedId].icon; // 씨앗 주머니
+        } else if (field.state === "growing") {
+            imageSrc = DATA.ITEMS[field.seedId].growthStages.growing; // 새싹
+        } else if (field.state === "ready") {
+            imageSrc = DATA.ITEMS[field.seedId].growthStages.ready; // 다 자란 모습
+        }
+        // empty 일 땐 imageSrc 가 null → 빈 셀
+
+        if (imageSrc) {
             const img = document.createElement("img");
-            img.src = DATA.ITEMS[field.seedId].icon;
-            img.alt = DATA.ITEMS[field.seedId].displayName;
+            img.src = imageSrc;
             img.className = "field-cell-icon";
             cell.appendChild(img);
         }

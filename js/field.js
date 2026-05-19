@@ -47,22 +47,31 @@ class Field {
     }
 
     /**
-     * 물을 준다. planted → growing, 타이머 시작
+     * 물을 준다. planted → growing. 타이머 시작 (growEndTime 설정).
      * @returns {boolean} 성공 여부
      */
     water() {
-        // TODO Phase 2
-        return false;
+        if (this.state !== "planted") return false;
+
+        this.state = "growing";
+        this.growEndTime =
+            Date.now() + DATA.CONFIG.FIELD.GROW_TIME_SECONDS * 1000;
+        return true;
     }
 
     /**
-     * 시간 다 됐는지 체크. growing → ready 자동 전환.
-     * 렌더 루프에서 매번 호출됨.
-     * @returns {boolean} 방금 ready 로 바뀌었으면 true
+     * 시간 다 됐는지 체크 후 자동 전환. growing → ready.
+     * 렌더 루프/틱에서 매번 호출됨.
+     * @returns {boolean} 방금 ready 로 바뀌었으면 true (알림용)
      */
     checkGrowth() {
-        // TODO Phase 2
-        return false;
+        if (this.state !== "growing") return false;
+        if (Date.now() < this.growEndTime) return false;
+
+        // 시간 다 됨 → ready 로 전환
+        this.state = "ready";
+        this.growEndTime = null;
+        return true;
     }
 
     /**
@@ -84,7 +93,8 @@ class Field {
      * @returns {number | null}
      */
     getRemainingTime() {
-        // TODO Phase 2
-        return null;
+        if (this.state !== "growing") return null;
+        const remainingMs = this.growEndTime - Date.now();
+        return Math.max(0, Math.ceil(remainingMs / 1000));
     }
 }
