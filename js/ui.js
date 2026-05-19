@@ -134,17 +134,20 @@ function renderField() {
     const field = STATE.field;
 
     // 1. 타이머 (상단 중앙) — growing 일 때만 텍스트 표시 (:empty CSS 로 자동 숨김)
-    const timer = document.createElement("div");
-    timer.id = "field-timer";
-    const remaining = field.getRemainingTime();
-    timer.textContent = remaining !== null ? `${remaining}초` : "";
-    container.appendChild(timer);
-
+    if (field.state === "growing") {
+        const timer = document.createElement("div");
+        timer.id = "field-timer";
+        const remaining = field.getRemainingTime();
+        timer.textContent = remaining !== null ? `${remaining}초` : "";
+        container.appendChild(timer);
+    }
     // 2. 물주기 버튼 (상단 우측) — Phase 2 에서 핸들러 연결
-    const waterBtn = document.createElement("button");
-    waterBtn.id = "btn-water";
-    waterBtn.textContent = "물주기";
-    container.appendChild(waterBtn);
+    if (field.canWater()) {
+        const waterBtn = document.createElement("button");
+        waterBtn.id = "btn-water";
+        waterBtn.textContent = "물주기";
+        container.appendChild(waterBtn);
+    }
 
     // 3. 3x3 밭 그리드 (중앙) — 상태에 따라 셀 내용 달라짐
     const grid = document.createElement("div");
@@ -158,9 +161,10 @@ function renderField() {
         // 상태별로 셀에 표시할 이미지 결정
         let imageSrc = null;
         if (field.state === "planted") {
-            imageSrc = DATA.ITEMS[field.seedId].icon; // 씨앗 주머니
+            // imageSrc = DATA.ITEMS[field.seedId].icon; // 씨앗 주머니
+            imageSrc = DATA.ITEMS[field.seedId].growthStages.bud; // 새싹
         } else if (field.state === "growing") {
-            imageSrc = DATA.ITEMS[field.seedId].growthStages.growing; // 새싹
+            imageSrc = DATA.ITEMS[field.seedId].growthStages.growing; // 성장과정
         } else if (field.state === "ready") {
             imageSrc = DATA.ITEMS[field.seedId].growthStages.ready; // 다 자란 모습
         }
@@ -181,8 +185,10 @@ function renderField() {
     container.appendChild(grid);
 
     // 4. 수확하기 버튼 (우하단) — Phase 3 에서 핸들러 연결
-    const harvestBtn = document.createElement("button");
-    harvestBtn.id = "btn-harvest";
-    harvestBtn.textContent = "수확하기";
-    container.appendChild(harvestBtn);
+    if (field.canHarvest()) {
+        const harvestBtn = document.createElement("button");
+        harvestBtn.id = "btn-harvest";
+        harvestBtn.textContent = "수확하기";
+        container.appendChild(harvestBtn);
+    }
 }

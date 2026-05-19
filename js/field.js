@@ -75,13 +75,26 @@ class Field {
     }
 
     /**
-     * 수확. ready → empty. 작물 종류와 갯수 반환.
+     * 수확. ready → empty. 작물 종류와 랜덤 갯수 반환.
      * 인벤토리 추가는 호출자가 처리.
      * @returns {{cropId: string, count: number} | null}
      */
     harvest() {
-        // TODO Phase 3
-        return null;
+        if (this.state !== "ready") return null;
+
+        // 작물 ID 와 랜덤 수확량 결정
+        const cropId = DATA.ITEMS[this.seedId].growsInto;
+        const { HARVEST_MIN, HARVEST_MAX } = DATA.CONFIG.FIELD;
+        const count =
+            Math.floor(Math.random() * (HARVEST_MAX - HARVEST_MIN + 1)) +
+            HARVEST_MIN;
+
+        // 밭 리셋
+        this.state = "empty";
+        this.seedId = null;
+        this.growEndTime = null;
+
+        return { cropId, count };
     }
 
     // ─────────────────────────────────────────
@@ -96,5 +109,25 @@ class Field {
         if (this.state !== "growing") return null;
         const remainingMs = this.growEndTime - Date.now();
         return Math.max(0, Math.ceil(remainingMs / 1000));
+    }
+
+    // ─────────────────────────────────────────
+    // 상태 조회 헬퍼 (UI 가 버튼 표시 여부 결정할 때 사용)
+    // 단순히 state 비교지만 의미가 명확해짐.
+    // ─────────────────────────────────────────
+
+    /** @returns {boolean} 새 씨앗을 심을 수 있는 상태? */
+    canPlant() {
+        return this.state === "empty";
+    }
+
+    /** @returns {boolean} 물을 줄 수 있는 상태? */
+    canWater() {
+        return this.state === "planted";
+    }
+
+    /** @returns {boolean} 수확할 수 있는 상태? */
+    canHarvest() {
+        return this.state === "ready";
     }
 }

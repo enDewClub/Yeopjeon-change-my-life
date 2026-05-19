@@ -99,6 +99,28 @@ window.addEventListener("DOMContentLoaded", () => {
         $("message-area").textContent = ""; // 이전 메시지 지움, 타이머가 시각적 피드백
     }
 
+    /**
+     * 수확하기 버튼 클릭 → 작물을 인벤토리에 추가 + 밭 리셋.
+     * 인벤토리에 선택된 아이템이 있어도 그대로 둠 (씨앗이면 바로 다시 심기 가능).
+     */
+    function onHarvestClick() {
+        const result = STATE.field.harvest();
+        if (!result) return; // ready 상태가 아니면 무시
+
+        const { cropId, count } = result;
+
+        // 인벤토리에 작물 추가
+        STATE.inventory.addItem(cropId, count);
+
+        // 화면 갱신
+        renderInventory();
+        renderField();
+
+        // 메시지 — 사용자가 선택해둔 씨앗 메시지를 덮어씀 (의도된 동작)
+        const cropName = DATA.ITEMS[cropId].displayName;
+        $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+    }
+
     // ═══════════════════════════════════════════════
     // 밭 영역 클릭 디스패처 (이벤트 위임)
     // #map-interactables 안의 어떤 요소를 눌렀는지 확인 후 적절한 핸들러로 분기
@@ -114,7 +136,11 @@ window.addEventListener("DOMContentLoaded", () => {
             onWaterClick();
             return;
         }
-        // TODO Phase 3: btn-harvest
+        // 수확하기 버튼 클릭
+        if (event.target.id === "btn-harvest") {
+            onHarvestClick();
+            return;
+        }
     });
 
     // 상점의 "나가기" 버튼
