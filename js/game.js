@@ -33,6 +33,7 @@ function onTitleStart() {
     renderMap(STATE.currentMap); // STATE.currentMap 는 resetGameState 에서 "home" 으로 설정됨
     renderInventory();
     renderMoney();
+    console.log(STATE.inventory.slotsArray[1].type);
 }
 
 // ═══════════════════════════════════════════════
@@ -56,7 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const index = Number(slotEl.dataset.slotIndex);
 
         // 빈 슬롯 클릭은 무시 (선택할 게 없음)
-        if (STATE.inventory.slots[index] === null) return;
+        if (STATE.inventory.slotsArray[index] === null) return;
 
         STATE.inventory.selectSlot(index);
 

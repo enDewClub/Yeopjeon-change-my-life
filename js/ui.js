@@ -53,14 +53,14 @@ function renderMoney() {
 
 /**
  * 인벤토리 전체를 다시 그린다.
- * STATE.inventory.slots 의 각 슬롯마다 div 하나씩 생성.
+ * STATE.inventory.slotsArray 의 각 슬롯마다 div 하나씩 생성.
  * 선택된 슬롯에는 .selected 클래스 추가.
  */
 function renderInventory() {
     const bar = $("inventory-bar");
     bar.innerHTML = ""; // 기존 슬롯 모두 지우기
 
-    STATE.inventory.slots.forEach((slot, index) => {
+    STATE.inventory.slotsArray.forEach((slot, index) => {
         bar.appendChild(createSlotElement(slot, index));
     });
 }

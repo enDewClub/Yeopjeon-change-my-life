@@ -4,7 +4,7 @@
 // 플레이어의 인벤토리 상태(슬롯 배열)와 행동(추가/제거/선택)을
 // 한 곳에 묶은 객체. data.js / state.js 처럼 분리하지 않고
 // 클래스로 합치는 이유:
-//   - 인벤토리의 데이터(slots)와 그걸 다루는 로직이 항상 같이 다님
+//   - 인벤토리의 데이터(slotsArray)와 그걸 다루는 로직이 항상 같이 다님
 //   - "인벤토리는 자기 자신을 관리한다" 라는 캡슐화(encapsulation)
 //   - API 가 깔끔해짐: STATE.inventory.addItem("garlic_seed", 3)
 //
@@ -26,7 +26,7 @@ class Inventory {
      */
     constructor(size) {
         this.size = size; // 슬롯 갯수
-        this.slots = new Array(size).fill(null); // 슬롯 배열 (null = 빈 칸, 아니면 { itemId, count })
+        this.slotsArray = new Array(size).fill(null); // 슬롯 배열 (null = 빈 칸, 아니면 { itemId, count })
         this.selectedSlotIndex = null; // 현재 선택된 슬롯 위치 (없으면 null)
     }
 
@@ -45,23 +45,23 @@ class Inventory {
      */
     addItem(itemId, count) {
         // 1. 같은 아이템 슬롯이 이미 있나? 있으면 거기에 쌓기
-        const existingIndex = this.slots.findIndex(
+        const existingIndex = this.slotsArray.findIndex(
             (slot) => slot !== null && slot.itemId === itemId,
         );
 
         if (existingIndex !== -1) {
-            this.slots[existingIndex].count += count;
+            this.slotsArray[existingIndex].count += count;
             return true;
         }
 
         // 2. 없으면 빈 슬롯 찾아서 새로 넣기
-        const emptyIndex = this.slots.findIndex((slot) => slot === null);
+        const emptyIndex = this.slotsArray.findIndex((slot) => slot === null);
 
         if (emptyIndex === -1) {
             return false; // 빈 슬롯도 없음 → 인벤토리 꽉참
         }
 
-        this.slots[emptyIndex] = { itemId, count };
+        this.slotsArray[emptyIndex] = { itemId, count };
         return true;
     }
 
@@ -75,15 +75,15 @@ class Inventory {
     removeItem(itemId, count) {
         if (!this.hasItem(itemId, count)) return false;
 
-        const slotIndex = this.slots.findIndex(
+        const slotIndex = this.slotsArray.findIndex(
             (slot) => slot !== null && slot.itemId === itemId,
         );
 
-        this.slots[slotIndex].count -= count;
+        this.slotsArray[slotIndex].count -= count;
 
         // 갯수가 0 이하면 슬롯 비우기
-        if (this.slots[slotIndex].count <= 0) {
-            this.slots[slotIndex] = null;
+        if (this.slotsArray[slotIndex].count <= 0) {
+            this.slotsArray[slotIndex] = null;
         }
 
         return true;
@@ -110,7 +110,7 @@ class Inventory {
      * @returns {number}
      */
     getItemCount(itemId) {
-        const slot = this.slots.find(
+        const slot = this.slotsArray.find(
             (slot) => slot !== null && slot.itemId === itemId,
         );
         return slot ? slot.count : 0;
@@ -149,7 +149,7 @@ class Inventory {
     getSelectedItem() {
         if (this.selectedSlotIndex === null) return null;
 
-        const slot = this.slots[this.selectedSlotIndex];
+        const slot = this.slotsArray[this.selectedSlotIndex];
         if (slot === null) return null;
 
         return DATA.ITEMS[slot.itemId];

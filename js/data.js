@@ -156,7 +156,7 @@ const DATA = {
     // 3. ITEMS - 모든 아이템 정의
     //
     // 인벤토리는 아이템 ID 만 저장하고, 실제 정보는 여기서 조회.
-    //   STATE.inventory.slots[0] = { itemId: "potato_seed", count: 3 }
+    //   STATE.inventory.slotsArray[0] = { itemId: "potato_seed", count: 3 }
     //   → 표시할 때 DATA.ITEMS["potato_seed"].displayName 로 조회
     //
     // 정의 방식: defineItems() 헬퍼로 자동 생성.
