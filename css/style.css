@@ -525,3 +525,31 @@ body {
     background-color: var(--secondary-700);
     color: var(--text-inverse);
 }
+
+/* ═══════════════════════════════════════════════
+   특수 액션 버튼 (입궁하기, 상점 들어가기 등)
+   #map-exits 안에 들어가므로 pointer-events: auto 필수
+   ═══════════════════════════════════════════════ */
+.special-action-btn {
+    position: absolute;
+    bottom: var(--spacing-6);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-3) var(--spacing-6);
+    background-color: var(--primary-500);
+    color: var(--neutral-900);
+    border: none;
+    border-radius: var(--radius-base);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    pointer-events: auto; /* ← 핵심: 부모의 pointer-events: none 무시 */
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.15s;
+}
+
+.special-action-btn:hover {
+    background-color: var(--primary-700);
+    color: var(--text-inverse);
+}

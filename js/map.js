@@ -115,8 +115,7 @@ function handleSpecialAction(actionType) {
             switchScene("ending");
             break;
         case "goStore":
-            switchScene("store");
-            enterStore();
+            onEnterStoreClick();
             break;
         // 미래에 추가될 수 있는 것들:
         // case "openInventoryMenu": ...

@@ -144,7 +144,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     // 상점의 "나가기" 버튼
-    // $("btn-leave-store").addEventListener("click", onLeaveStore);
+    $("btn-leave-store").addEventListener("click", onExitStoreClick);
 
     // 엔딩의 "다시하기" 버튼
     $("btn-restart").addEventListener("click", startNewGame);

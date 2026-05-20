@@ -1,231 +1,343 @@
 // ═══════════════════════════════════════════════════════
-// store.js - 상점 시스템 (Shop System)
+// store.js - 상점 시스템 (Store System)
 //
 // 마을 중심의 '상점' 버튼을 누르면 진입하는 씬.
 //
-// 1단계 (지금 만드는 거): 클릭하면 즉시 구매/판매. 팝업 없음.
-// 2단계 (나중): 팝업창에서 수량 선택. (1단계 끝나고 추가 예정)
+// 1단계 (지금):
+//   - 구매: 클릭 = 즉시 1개 구매 (팝업 X)
+//   - 판매: 클릭 = 그 아이템 전부 판매 (팝업 X)
+//
+// 2단계 (나중): 팝업창에서 수량 선택.
 //
 // 흐름:
 //   마을 → '상점' 버튼 클릭
-//     → onEnterShopClick()      (씬 전환 + 초기 렌더)
-//   상점 안에서 '구매하기' 버튼 클릭
-//     → onBuyItemClick(itemId)  (소지금 차감 + 인벤 추가)
-//     → renderInStore()         (다시 그리기)
-//   인벤 아이템 클릭
-//     → onSellItemClick(itemId) (다 팔고 소지금 증가)
-//     → renderInStore()
+//     → onEnterStoreClick()    (씬 전환 + 초기 렌더)
+//   상점 구매 버튼 클릭
+//     → onBuyItemClick(itemId) → onBuyClick(itemId)
+//   상점 판매 아이템 클릭
+//     → onSellItemClick(itemId) → onSellClick(itemId)
 //   '나가기' 버튼 클릭
-//     → onExitShopClick()       (게임 씬으로)
+//     → onExitStoreClick()
 //
 // 작업 순서 (작은 거 → 큰 거):
-//   1. canAfford            (제일 단순, 다른 함수 안 씀)
-//   2. renderBuyItemButton  (헬퍼)
-//   3. renderSellItemButton (헬퍼)
-//   4. renderBuyItemList    (위 헬퍼 사용)
-//   5. renderSellItemList   (위 헬퍼 사용)
-//   6. renderInStore        (위 3개 다 호출하는 묶음)
-//   7. onEnterShopClick     (씬 전환 + renderInStore)
-//   8. onExitShopClick      (씬 전환만)
-//   9. onBuyItemClick       (위 다 사용)
-//  10. onSellItemClick      (위 다 사용)
+//   1. isAffordable, calculateTotalPrice      (헬퍼)
+//   2. onEnterStoreClick, onExitStoreClick,
+//      onBuyItemClick, onSellItemClick        (단순 핸들러)
+//   3. onBuyClick, onSellClick                (실제 액션)
+//   4. renderStore, renderBuyItemList, ...    (렌더 - 나중 차례)
+//
+// ─── 테스트 사용법 ─────────────────────────────
+// 각 함수 밑에 console.log 테스트가 코멘트로 있음.
+// 함수 채운 후 → 한 줄씩 코멘트 풀기 (// 제거) → HTML 새로고침 → F12 콘솔에서 값 확인.
+// 콘솔 출력값과 옆에 적힌 expected (→ 옆) 가 같으면 통과 ✅
+// `resetGameState()` 가 깨끗한 상태로 초기화함 (소지금 100, 시작 인벤).
 // ═══════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════
 // 1. 헬퍼 함수 (Helpers)
-// 다른 함수들 안에서 쓰는 작은 도구.
 // ═══════════════════════════════════════════════
 
 /**
- * 현재 소지금으로 가격을 낼 수 있는지 확인한다.
- * @param {number} price - 비교할 가격
- * @returns {boolean} 충분하면 true, 부족하면 false
+ * 가진 돈으로 가격을 낼 수 있는지 확인한다.
+ * @param {number} myMoney   - 지금 가진 돈
+ * @param {number} itemPrice - 사려는 물건 값
+ * @returns {boolean} 살 수 있으면 true, 아니면 false
  */
-function canAfford(price) {
-    // pseudocode:
-    // STATE.money 가 price 이상이면 true, 아니면 false 리턴
-    // 코드:
+function isAffordable(myMoney, itemPrice) {
+    // 여기 채우기
 }
 
+// ─── isAffordable 테스트 ──────────────────────
+// console.log(isAffordable(100, 50));    // → true   (충분)
+// console.log(isAffordable(50, 50));     // → true   (딱 맞음)
+// console.log(isAffordable(30, 50));     // → false  (부족)
+// console.log(isAffordable(0, 100));     // → false  (돈 0)
+// console.log(isAffordable(100, 0));     // → true   (공짜)
+
+/**
+ * 총 금액을 계산한다. (단가 × 수량)
+ * @param {number} itemPrice - 단가 (한 개 가격)
+ * @param {number} count     - 수량
+ * @returns {number} totalPrice
+ */
+function calculateTotalPrice(itemPrice, count) {
+    // 여기 채우기
+}
+
+// ─── calculateTotalPrice 테스트 ──────────────
+// console.log(calculateTotalPrice(7, 3));      // → 21
+// console.log(calculateTotalPrice(10, 1));     // → 10  (1개)
+// console.log(calculateTotalPrice(5, 0));      // → 0   (수량 0)
+// console.log(calculateTotalPrice(0, 5));      // → 0   (공짜)
+// console.log(calculateTotalPrice(100, 10));   // → 1000
+
 // ═══════════════════════════════════════════════
-// 2. 씬 진입 / 종료
+// 2. 씬 진입/종료 + 단순 클릭 핸들러
+// 짧은 함수들 - 대부분 다른 함수 호출만 함.
 // ═══════════════════════════════════════════════
 
 /**
  * 상점 씬으로 들어간다.
  * 마을의 '상점' 특수 버튼이 눌렸을 때 map.js 에서 호출됨.
+ *
+ * ★ 이 함수는 layout 참고용으로 미리 작성됨 (다른 함수 채울 때 형식 참고)
  */
-function onEnterShopClick() {
-    // pseudocode:
-    // 1. switchScene("shop") 호출 (씬 전환)
-    // 2. renderInStore() 호출 (상점 안 모든 요소 그리기)
-    // 코드:
+function onEnterStoreClick() {
+    // 1. 씬 전환
+    switchScene("store");
+
+    // 2. 상점 안의 모든 UI 요소 그리기
+    renderStore();
 }
+
+// ─── onEnterStoreClick 테스트 ────────────────
+// resetGameState();
+// onEnterStoreClick();
+// console.log(STATE.currentScene);    // → "store"
+//
+// onExitStoreClick();                 // 다시 나가기
+// onEnterStoreClick();                // 다시 들어가기
+// console.log(STATE.currentScene);    // → "store"
 
 /**
  * 상점 씬을 종료하고 게임 씬으로 돌아간다.
- * 상점의 '나가기' 버튼이 눌렸을 때 호출됨 (game.js 에 연결됨).
- * 게임 씬으로 돌아가면 인벤/소지금 표시도 새로 그려야 함.
+ * 게임 씬 인벤바 + 소지금 표시도 새로 그려줘야 함 (상점에서 바뀐 게 있으니까).
  */
-function onExitShopClick() {
-    // pseudocode:
-    // 1. switchScene("game") 호출
-    // 2. renderInventory() 호출 (게임 씬의 인벤 바 갱신)
-    // 3. renderMoney() 호출 (게임 씬의 소지금 갱신)
-    // 코드:
+function onExitStoreClick() {
+    // 여기 채우기
 }
 
-// ═══════════════════════════════════════════════
-// 3. 마스터 렌더러
-// 상점 안 모든 요소를 한 번에 그리는 함수.
-// 처음 들어올 때 + 구매/판매 후 갱신 때 호출.
-// ═══════════════════════════════════════════════
+// ─── onExitStoreClick 테스트 ─────────────────
+// resetGameState();
+// onEnterStoreClick();
+// console.log(STATE.currentScene);    // → "store"
+// onExitStoreClick();
+// console.log(STATE.currentScene);    // → "game"
+// (그리고 화면에서 게임 씬의 인벤바, 소지금이 새로 그려졌는지 눈으로 확인)
 
 /**
- * 상점 안의 모든 UI 요소를 그린다.
- */
-function renderStore() {
-    // pseudocode:
-    // 1. renderBuyItemList() 호출
-    // 2. renderSellItemList() 호출
-    // 3. renderMoney() 호출 (ui.js 에 이미 있음 — 그대로 부르기)
-    // 코드:
-}
-
-// ═══════════════════════════════════════════════
-// 4. 구매 영역 (Buy Section)
-// 살 수 있는 아이템들. 가격 고정이라 한 번 그리고 끝.
-// ═══════════════════════════════════════════════
-
-/**
- * 살 수 있는 아이템 리스트를 #shop-buy-section 안에 그린다.
- * DATA.ITEMS 의 아이템 중 buyPrice 가 있는 것만.
- */
-function renderBuyItemList() {
-    // pseudocode:
-    // 1. #shop-buy-section 의 안 내용 비우기 (다시 그리기 위해)
-    // 2. DATA.ITEMS 의 각 아이템(itemId, item)을 순회
-    //    - item.buyPrice 가 없으면 건너뛰기 (못 사는 거)
-    //    - 있으면: renderBuyItemButton(itemId) 로 버튼 만들어서 추가
-    // 힌트:
-    //   객체 순회: for (const itemId in DATA.ITEMS) { ... }
-    //              또는 Object.keys(DATA.ITEMS).forEach(itemId => { ... })
-    //   요소 비우기: element.innerHTML = ""
-    //   요소 추가: element.appendChild(...)
-    // 코드:
-}
-
-/**
- * 구매 버튼 하나를 만들어서 리턴한다. (renderBuyItemList 가 사용)
- * 버튼 안에 아이콘 + 이름 + 가격이 보여야 함.
- * 클릭하면 onBuyItemClick(itemId) 가 호출되도록 이벤트 리스너 등록.
- * @param {string} itemId
- * @returns {HTMLElement}
- */
-function renderBuyItemButton(itemId) {
-    // pseudocode:
-    // 1. DATA.ITEMS[itemId] 로 아이템 정보 가져오기
-    // 2. <button> element 만들기
-    // 3. 안에 아이콘 <img> + 이름 <span> + 가격 <span> 추가
-    // 4. 버튼에 click 이벤트 리스너 추가: onBuyItemClick(itemId) 호출
-    // 5. 버튼 리턴
-    // 힌트:
-    //   element 만들기: document.createElement("button")
-    //   클래스 추가: el.className = "shop-buy-btn"
-    //   클릭 등록: btn.addEventListener("click", () => onBuyItemClick(itemId))
-    //   참고: ui.js 의 createSlotElement 가 비슷한 패턴 — img + count span
-    // 코드:
-}
-
-// ═══════════════════════════════════════════════
-// 5. 판매 영역 (Sell Section)
-// 인벤토리 안의 아이템들. 인벤 바뀌면 다시 그려야 함.
-// ═══════════════════════════════════════════════
-
-/**
- * 인벤토리 안의 팔 수 있는 아이템들을 #shop-sell-section 안에 그린다.
- * 빈 슬롯은 무시, sellPrice 없는 아이템도 무시.
- */
-function renderSellItemList() {
-    // pseudocode:
-    // 1. #shop-sell-section 의 안 내용 비우기
-    // 2. STATE.inventory.slots 의 각 slot 을 순회
-    //    - slot 이 null 이면 건너뛰기 (빈 슬롯)
-    //    - DATA.ITEMS[slot.itemId].sellPrice 가 없으면 건너뛰기 (못 팜)
-    //    - 있으면: renderSellItemButton(slot) 로 버튼 만들어서 추가
-    // 힌트:
-    //   순회: STATE.inventory.slots.forEach((slot) => { ... })
-    //   참고: ui.js 의 renderInventory 가 비슷한 패턴
-    // 코드:
-}
-
-/**
- * 판매 버튼 하나를 만들어서 리턴한다. (renderSellItemList 가 사용)
- * 버튼 안에 아이콘 + 갯수 + 판매가가 보여야 함.
- * 클릭하면 onSellItemClick(slot.itemId) 호출.
- * @param {object} slot - { itemId, count }
- * @returns {HTMLElement}
- */
-function renderSellItemButton(slot) {
-    // pseudocode:
-    // 1. DATA.ITEMS[slot.itemId] 로 아이템 정보 가져오기 (sellPrice 필요)
-    // 2. <button> element 만들기
-    // 3. 안에 아이콘 + 갯수 + 판매가 추가
-    // 4. 클릭 이벤트 리스너: onSellItemClick(slot.itemId) 호출
-    // 5. 버튼 리턴
-    // 코드:
-}
-
-// ═══════════════════════════════════════════════
-// 6. 구매 / 판매 액션 — 1단계 버전
-//
-// 1단계: 클릭 = 즉시 구매/판매 (팝업 없음)
-// 2단계 (LATER): 클릭 = 팝업 띄움, 팝업에서 수량 선택 후 구매/판매
-// → 함수 이름은 그대로, 안의 코드만 2단계에서 바뀜
-// ═══════════════════════════════════════════════
-
-/**
- * 구매 버튼을 클릭했을 때 호출.
- * 1단계: 즉시 아이템 1개 구매.
+ * 구매 아이템 버튼이 클릭됐을 때.
+ * 1단계: 곧장 onBuyClick(itemId) 호출.
+ * (2단계에선 팝업창을 띄우는 걸로 바뀜)
  * @param {string} itemId
  */
 function onBuyItemClick(itemId) {
-    // pseudocode:
-    // 1. DATA.ITEMS[itemId] 로 아이템 정보 가져오기 (buyPrice 필요)
-    // 2. canAfford(item.buyPrice) 가 false 면 return (돈 부족)
-    // 3. STATE.money 에서 buyPrice 빼기
-    // 4. STATE.inventory.addItem(itemId, 1) 호출
-    // 5. renderInStore() 호출 (화면 다시 그리기)
-    // 코드:
+    // 여기 채우기
 }
 
+// ─── onBuyItemClick 테스트 (onBuyClick 과 결과 같아야 함) ──
+// resetGameState();
+// onBuyItemClick("garlic_seed");
+// console.log(STATE.money);                                   // → 90
+// console.log(STATE.inventory.getItemCount("garlic_seed"));   // → 3
+//
+// resetGameState();
+// onBuyItemClick("potato_seed");
+// console.log(STATE.money);                                   // → 80
+
 /**
- * 판매 아이템을 클릭했을 때 호출.
- * 1단계: 인벤토리에 있는 그 아이템을 모두 한 번에 판매.
+ * 판매 아이템 버튼이 클릭됐을 때.
+ * 1단계: 곧장 onSellClick(itemId) 호출.
  * @param {string} itemId
  */
 function onSellItemClick(itemId) {
-    // pseudocode:
-    // 1. DATA.ITEMS[itemId] 로 아이템 정보 가져오기 (sellPrice 필요)
-    // 2. STATE.inventory.getItemCount(itemId) 로 갯수 알아내기
-    // 3. 갯수가 0 이면 return (팔 게 없음 — 안전장치)
-    // 4. 총 금액 = 갯수 × sellPrice 계산
-    // 5. STATE.money 에 총 금액 더하기
-    // 6. STATE.inventory.removeItem(itemId, 갯수) 호출 (전부 제거)
-    // 7. renderInStore() 호출
-    // 코드:
+    // 여기 채우기
+}
+
+// ─── onSellItemClick 테스트 (onSellClick 과 결과 같아야 함) ──
+// resetGameState();
+// STATE.inventory.addItem("garlic", 3);
+// onSellItemClick("garlic");
+// console.log(STATE.money);                              // → 109 (100 + 3*3)
+// console.log(STATE.inventory.getItemCount("garlic"));   // → 0
+
+// ═══════════════════════════════════════════════
+// 3. 액션 함수 — 실제 구매 / 판매
+// ═══════════════════════════════════════════════
+
+/**
+ * 아이템을 1개 구매한다 (1단계).
+ * 돈 부족하면 아무 일도 안 함.
+ * @param {string} itemId
+ */
+function onBuyClick(itemId) {
+    // 여기 채우기
+}
+
+// ─── onBuyClick 테스트 ──────────────────────
+// ① 정상 구매
+// resetGameState();
+// onBuyClick("garlic_seed");
+// console.log(STATE.money);                                   // → 90
+// console.log(STATE.inventory.getItemCount("garlic_seed"));   // → 3
+//
+// ② 돈 부족 → 변동 없음
+// resetGameState(); STATE.money = 5;
+// onBuyClick("garlic_seed");
+// console.log(STATE.money);                                   // → 5
+// console.log(STATE.inventory.getItemCount("garlic_seed"));   // → 2
+//
+// ③ 딱 맞는 돈
+// resetGameState(); STATE.money = 10;
+// onBuyClick("garlic_seed");
+// console.log(STATE.money);                                   // → 0
+// console.log(STATE.inventory.getItemCount("garlic_seed"));   // → 3
+//
+// ④ 여러 번 구매 (같은 슬롯에 쌓이는지)
+// resetGameState();
+// onBuyClick("garlic_seed"); onBuyClick("garlic_seed"); onBuyClick("garlic_seed");
+// console.log(STATE.money);                                   // → 70
+// console.log(STATE.inventory.getItemCount("garlic_seed"));   // → 5
+//
+// ⑤ 다른 아이템 구매
+// resetGameState();
+// onBuyClick("potato_seed");
+// console.log(STATE.money);                                   // → 80
+// console.log(STATE.inventory.getItemCount("potato_seed"));   // → 4
+
+/**
+ * 인벤토리의 그 아이템을 전부 판매한다 (1단계).
+ * 인벤에 없으면 아무 일도 안 함.
+ * @param {string} itemId
+ */
+function onSellClick(itemId) {
+    // 여기 채우기
+}
+
+// ─── onSellClick 테스트 ──────────────────────
+// ① 정상 판매 (다 팔림)
+// resetGameState();
+// STATE.inventory.addItem("garlic", 3);
+// onSellClick("garlic");
+// console.log(STATE.money);                              // → 109 (100 + 3*3)
+// console.log(STATE.inventory.getItemCount("garlic"));   // → 0
+//
+// ② 팔 게 없음 → 변동 없음
+// resetGameState();
+// onSellClick("garlic");
+// console.log(STATE.money);                              // → 100 (변동 X)
+//
+// ③ 1개만 판매
+// resetGameState();
+// STATE.inventory.addItem("potato", 1);
+// onSellClick("potato");
+// console.log(STATE.money);                              // → 107
+// console.log(STATE.inventory.getItemCount("potato"));   // → 0
+//
+// ④ 큰 수량 판매
+// resetGameState();
+// STATE.inventory.addItem("potato", 10);
+// onSellClick("potato");
+// console.log(STATE.money);                              // → 170 (100 + 7*10)
+// console.log(STATE.inventory.getItemCount("potato"));   // → 0
+
+// ═══════════════════════════════════════════════
+// 4. 마스터 렌더러
+// ═══════════════════════════════════════════════
+
+function renderStore() {
+    // 여기 채우기
+}
+
+// ═══════════════════════════════════════════════
+// 5. 구매 영역 렌더
+// ═══════════════════════════════════════════════
+//
+function renderBuyItemButton(itemId) {
+    // 클릭한 아이템의 저장된 정보(아이콘 이름/가격)를 불러와서 버튼을 그린다
+
+    // 1. 해당 아이템 DATA.ITEMS[itemId] 를 item 변수에 저장
+    const item = DATA.ITEMS[itemId];
+
+    // 2. <button> element 를 만들고 className = "store-item-button" 부여
+    const btn = document.createElement("button");
+    btn.className = "store-item-button";
+
+    // 3. <img> element 만들기:
+    //    - src = item.icon
+    //    - alt = item.displayName
+    //    - 버튼에 appendChild
+    const icon = document.createElement("img");
+    icon.src = item.icon;
+    icon.alt = item.displayName;
+    btn.appendChild(icon);
+
+    // 4. <span> element 만들기:
+    //    - textContent = item.displayName
+    //    - 버튼에 appendChild
+    const name = document.createElement("span");
+    name.textContent = item.displayName;
+    btn.appendChild(name);
+
+    // 5. <span> element 만들기:
+    //    - textContent = item.buyPrice + "푼"
+    //    - 버튼에 appendChild
+    const price = document.createElement("span");
+    price.textContent = item.buyPrice + "푼";
+    btn.appendChild(price);
+
+    // 6. 클릭 핸들러 부착 — addEventListener("click", () => onBuyItemClick(itemId))
+    btn.addEventListener("click", () => onBuyItemClick(itemId));
+
+    // 7. 버튼을 return
+    return btn;
+}
+
+function renderBuyItemList() {
+    // 여기 채우기
+}
+
+// ═══════════════════════════════════════════════
+// 6. 판매 영역 렌더
+// ═══════════════════════════════════════════════
+function renderSellItemButton(itemId) {
+    // 1. 해당 아이템 DATA.ITEMS[itemId] 를 item 변수에 저장
+    const item = DATA.ITEMS[itemId];
+
+    // 2. <button> element 를 만들고 className = "store-item-button" 부여
+    const btn = document.createElement("button");
+    btn.className = "store-item-button";
+
+    // 3. <img> element 만들기:
+    //    - src = item.icon
+    //    - alt = item.displayName
+    //    - 버튼에 appendChild
+    const icon = document.createElement("img");
+    icon.src = item.icon;
+    icon.alt = item.displayName;
+    btn.appendChild(icon);
+
+    // 4. <span> element 만들기 — 인벤토리에서 갯수를 직접 조회해서 표시:
+    //    - textContent = "×" + STATE.inventory.getItemCount(itemId)
+    //    - 버튼에 appendChild
+    const count = document.createElement("span");
+    count.textContent = "×" + STATE.inventory.getItemCount(itemId);
+    btn.appendChild(count);
+
+    // 5. <span> element 만들기:
+    //    - textContent = item.sellPrice + "푼"
+    //    - 버튼에 appendChild
+    const price = document.createElement("span");
+    price.textContent = item.sellPrice + "푼";
+    btn.appendChild(price);
+
+    // 6. 클릭 핸들러 부착 — addEventListener("click", () => onSellItemClick(itemId))
+    btn.addEventListener("click", () => onSellItemClick(itemId));
+
+    // 7. 버튼을 return
+    return btn;
+}
+
+function renderSellItemList() {
+    // 여기 채우기
 }
 
 // ═══════════════════════════════════════════════════════
-// ⬇️ 2단계 LATER - 아래는 1단계에서는 안 만듦
+// ⬇️ 2단계 LATER — 1단계에서는 안 만듦
 // ═══════════════════════════════════════════════════════
-// onBuyClick(itemId, count)       팝업의 '사기' 버튼 → 실제 구매
-// onSellClick(itemId, count)      팝업의 '팔기' 버튼 → 실제 판매
-// onShopCancelClick()             팝업 '안구매/안판매' 버튼
-// onAddCountClick()               팝업 수량 + 버튼
-// onSubtractCountClick()          팝업 수량 - 버튼
-// renderPopupWindow()             팝업창 자체 그리기
-// renderStoreNpc()                상점 NPC 캐릭터/말풍선
-//
-// 1단계 다 만들고 작동하는 거 확인한 후에 위 함수들 추가하면 됨.
-// 그때 onBuyItemClick / onSellItemClick 의 본문도 바뀜 (직접 처리 → 팝업 띄우기).
+// onStoreCancelClick()      팝업 닫기 버튼
+// onAddCountClick()         팝업 수량 +1
+// onSubtractCountClick()    팝업 수량 -1
+// renderBuyPopup(itemId)    구매 팝업창
+// renderSellPopup(itemId)   판매 팝업창
+// renderStoreNpc()          NPC 캐릭터/말풍선
