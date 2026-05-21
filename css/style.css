@@ -419,6 +419,18 @@ body {
     object-fit: contain;
 }
 
+#store-message {
+    height: var(--message-area-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-4);
+    background-color: var(--neutral-0);
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+}
 /* ═══════════════════════════════════════════════
    밭 맵 UI (#map-interactables 안에 동적 생성됨)
    ═══════════════════════════════════════════════ */
