@@ -111,6 +111,8 @@ const DATA = {
             SPECIAL_RADIUS: 120, // 특수 액션 버튼 (입궁하기, 상점 들어가기)
             FIELD_RADIUS: 150, // 밭 관련 (셀, 물주기, 수확하기)
         },
+
+        STORE_INVENTORY: ["potato_seed", "garlic_seed", "tomato_seed"],
     },
 
     // ═══════════════════════════════════════════════
