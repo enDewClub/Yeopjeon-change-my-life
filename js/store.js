@@ -44,15 +44,20 @@
  * @returns {boolean} 살 수 있으면 true, 아니면 false
  */
 function isAffordable(myMoney, itemPrice) {
-    // 여기 채우기
+    //1 소지금>=아이템 가격이면 살 수 있음
+    if(myMoney>=itemPrice){
+    return true;
+    }
+    //2 소지금<아이템 가격이면 살 수 없음
+    else return false;
 }
 
 // ─── isAffordable 테스트 ──────────────────────
-// console.log(isAffordable(100, 50));    // → true   (충분)
-// console.log(isAffordable(50, 50));     // → true   (딱 맞음)
-// console.log(isAffordable(30, 50));     // → false  (부족)
-// console.log(isAffordable(0, 100));     // → false  (돈 0)
-// console.log(isAffordable(100, 0));     // → true   (공짜)
+//console.log(isAffordable(100, 50));    // → true   (충분)
+//console.log(isAffordable(50, 50));     // → true   (딱 맞음)
+//console.log(isAffordable(30, 50));     // → false  (부족)
+//console.log(isAffordable(0, 100));     // → false  (돈 0)
+//console.log(isAffordable(100, 0));     // → true   (공짜)
 
 /**
  * 총 금액을 계산한다. (단가 × 수량)
@@ -61,15 +66,15 @@ function isAffordable(myMoney, itemPrice) {
  * @returns {number} totalPrice
  */
 function calculateTotalPrice(itemPrice, count) {
-    // 여기 채우기
+    return itemPrice * count;
 }
 
 // ─── calculateTotalPrice 테스트 ──────────────
-// console.log(calculateTotalPrice(7, 3));      // → 21
-// console.log(calculateTotalPrice(10, 1));     // → 10  (1개)
-// console.log(calculateTotalPrice(5, 0));      // → 0   (수량 0)
-// console.log(calculateTotalPrice(0, 5));      // → 0   (공짜)
-// console.log(calculateTotalPrice(100, 10));   // → 1000
+ //console.log(calculateTotalPrice(7, 3));      // → 21
+ //console.log(calculateTotalPrice(10, 1));     // → 10  (1개)
+ //console.log(calculateTotalPrice(5, 0));      // → 0   (수량 0)
+ //console.log(calculateTotalPrice(0, 5));      // → 0   (공짜)
+ //console.log(calculateTotalPrice(100, 10));   // → 1000
 
 // ═══════════════════════════════════════════════
 // 2. 씬 진입/종료 + 단순 클릭 핸들러
@@ -104,15 +109,25 @@ function onEnterStoreClick() {
  * 게임 씬 인벤바 + 소지금 표시도 새로 그려줘야 함 (상점에서 바뀐 게 있으니까).
  */
 function onExitStoreClick() {
-    // 여기 채우기
+    // 1. 씬 전환
+    switchScene("game");
+
+    // 2. 상점에서 옷/집을 업그레이드했을 수 있으니 현재 맵 다시 그리기 
+    renderMap(STATE.currentMap);
+
+    // 3. 인벤토리 다시 그리기 (상점에서 변경됐을 수 있음)
+    renderInventory();
+
+    // 4. 소지금 다시 그리기 (상점에서 변경됐을 수 있음)
+    renderMoney();
 }
 
 // ─── onExitStoreClick 테스트 ─────────────────
-// resetGameState();
-// onEnterStoreClick();
+ //resetGameState();
+ //onEnterStoreClick();
 // console.log(STATE.currentScene);    // → "store"
-// onExitStoreClick();
-// console.log(STATE.currentScene);    // → "game"
+ //onExitStoreClick();
+ //console.log(STATE.currentScene);    // → "game"
 // (그리고 화면에서 게임 씬의 인벤바, 소지금이 새로 그려졌는지 눈으로 확인)
 
 /**
@@ -122,7 +137,14 @@ function onExitStoreClick() {
  * @param {string} itemId
  */
 function onBuyItemClick(itemId) {
-    // 여기 채우기
+    //1 해당아이템 DATA.ITEMS[itemId] 을 selectedItem 변수이름에 저장하기
+    let selectedItem = DATA.ITEMS[itemId] ;
+
+    //2 구매하기함수를 불러오기 onBuyClick(itemId)
+    onBuyClick(itemId);
+
+    //3 저장된 정보 (DATA.ITEMS[itemId].display,  DATA.ITEMS[itemId].icon,
+    //DATA.ITEMS[itemId].description) 를 구매하기 함수에 보여준다. 
 }
 
 // ─── onBuyItemClick 테스트 (onBuyClick 과 결과 같아야 함) ──
@@ -141,15 +163,21 @@ function onBuyItemClick(itemId) {
  * @param {string} itemId
  */
 function onSellItemClick(itemId) {
-    // 여기 채우기
+    //1) 해당아이템 DATA.ITEMS[itemId] 을 selectedItem 변수로 이름에 저장하기
+    let selectedItem = DATA.ITEMS[itemId] ;
+    //2) 판매하기 함수를 불러오기 
+    onSellClick(itemId);
+
+    //3) 저장된 정보 (DATA.ITEMS[itemId].display,  DATA.ITEMS[itemId].icon,
+    //DATA.ITEMS[itemId].description) 를 구매하기 함수에 보여준다. 
 }
 
 // ─── onSellItemClick 테스트 (onSellClick 과 결과 같아야 함) ──
-// resetGameState();
-// STATE.inventory.addItem("garlic", 3);
-// onSellItemClick("garlic");
-// console.log(STATE.money);                              // → 109 (100 + 3*3)
-// console.log(STATE.inventory.getItemCount("garlic"));   // → 0
+ resetGameState();
+ STATE.inventory.addItem("garlic", 3);
+ onSellItemClick("garlic");
+ console.log(STATE.money);                              // → 109 (100 + 3*3)
+ console.log(STATE.inventory.getItemCount("garlic"));   // → 0
 
 // ═══════════════════════════════════════════════
 // 3. 액션 함수 — 실제 구매 / 판매
@@ -161,7 +189,25 @@ function onSellItemClick(itemId) {
  * @param {string} itemId
  */
 function onBuyClick(itemId) {
-    // 여기 채우기
+    let selectedItem = DATA.ITEMS[itemId];
+    
+// 1) 살 수 있는 돈이 있는지 체크 (가진 돈, 아이템 가격)
+    if (isAffordable(STATE.money, selectedItem.buyPrice) === false) {
+        return; 
+    }
+
+    // 2) 인벤토리에 아이템 1개 추가
+    let isAdded = STATE.inventory.addItem(itemId, 1);
+
+    // 3) 추가에 성공했을 때만 실제로 돈을 깎음
+    if (isAdded === true) {
+        let totalPrice = calculateTotalPrice(selectedItem.buyPrice, 1);
+        STATE.money = STATE.money - totalPrice;
+        
+    } else {
+        // addItem이 false를 리턴했다면 인벤토리가 꽉 찬 것
+        displayStoreMessage("인벤토리가 꽉 차서 살 수 없습니다!");
+    }
 }
 
 // ─── onBuyClick 테스트 ──────────────────────
@@ -193,7 +239,8 @@ function onBuyClick(itemId) {
 // resetGameState();
 // onBuyClick("potato_seed");
 // console.log(STATE.money);                                   // → 80
-// console.log(STATE.inventory.getItemCount("potato_seed"));   // → 4
+//ㄴ console.log(STATE.inventory.getItemCount("potato_seed"));   // → 4
+
 
 /**
  * 인벤토리의 그 아이템을 전부 판매한다 (1단계).
@@ -201,42 +248,66 @@ function onBuyClick(itemId) {
  * @param {string} itemId
  */
 function onSellClick(itemId) {
-    // 여기 채우기
+    let selectedItem = DATA.ITEMS[itemId];
+    
+    // 1) 인벤토리에 해당 아이템이 몇 개 있는지 체크하기
+    let sellCount = STATE.inventory.getItemCount(itemId);
+
+    // 2) 인벤토리에 아이템이 0개 이하로 있으면 아무 일도 안 함
+    if (sellCount <= 0) {
+        return; 
+    }
+
+    // 3) 인벤토리에서 그 아이템을 개수만큼 전부 제거하기
+    let isRemoved = STATE.inventory.removeItem(itemId, sellCount);
+
+    // 4) 인벤토리에서 제거 성공하면, 소지금에서 차감
+    if (isRemoved === true) {
+        // 총 판매 금액 = 단가 * 가지고 있던 수량 전부
+        let totalEarned = calculateTotalPrice(selectedItem.sellPrice, sellCount);
+        
+        // 돈을 더해서 다시 STATE.money에 저장
+        STATE.money = STATE.money + totalEarned;
+    }
 }
 
 // ─── onSellClick 테스트 ──────────────────────
 // ① 정상 판매 (다 팔림)
-// resetGameState();
-// STATE.inventory.addItem("garlic", 3);
-// onSellClick("garlic");
-// console.log(STATE.money);                              // → 109 (100 + 3*3)
-// console.log(STATE.inventory.getItemCount("garlic"));   // → 0
+ resetGameState();
+ STATE.inventory.addItem("garlic", 3);
+ onSellClick("garlic");
+ console.log(STATE.money);                              // → 109 (100 + 3*3)
+ console.log(STATE.inventory.getItemCount("garlic"));   // → 0
 //
 // ② 팔 게 없음 → 변동 없음
-// resetGameState();
-// onSellClick("garlic");
-// console.log(STATE.money);                              // → 100 (변동 X)
+ resetGameState();
+ onSellClick("garlic");
+ console.log(STATE.money);                              // → 100 (변동 X)
 //
 // ③ 1개만 판매
-// resetGameState();
-// STATE.inventory.addItem("potato", 1);
-// onSellClick("potato");
-// console.log(STATE.money);                              // → 107
-// console.log(STATE.inventory.getItemCount("potato"));   // → 0
+ resetGameState();
+ STATE.inventory.addItem("potato", 1);
+ onSellClick("potato");
+ console.log(STATE.money);                              // → 107
+ console.log(STATE.inventory.getItemCount("potato"));   // → 0
 //
 // ④ 큰 수량 판매
-// resetGameState();
-// STATE.inventory.addItem("potato", 10);
-// onSellClick("potato");
-// console.log(STATE.money);                              // → 170 (100 + 7*10)
-// console.log(STATE.inventory.getItemCount("potato"));   // → 0
+ resetGameState();
+ STATE.inventory.addItem("potato", 10);
+ onSellClick("potato");
+ console.log(STATE.money);                              // → 170 (100 + 7*10)
+ console.log(STATE.inventory.getItemCount("potato"));   // → 0
 
 // ═══════════════════════════════════════════════
 // 4. 마스터 렌더러
 // ═══════════════════════════════════════════════
 
 function renderStore() {
-    // 여기 채우기
+    renderMoney();
+    renderStoreNpc();
+    renderExitStoreButton();
+    renderBuyItemList();
+    renderSellItemList();
 }
 
 // ═══════════════════════════════════════════════
@@ -284,7 +355,22 @@ function renderBuyItemButton(itemId) {
 }
 
 function renderBuyItemList() {
-    // 여기 채우기
+    // 1. 컨테이너 가져오기
+    const container = $("shop-buy-section");
+
+    // 2. 기존 버튼 다 지우기
+    container.innerHTML = "";
+
+    // 3. DATA.CONFIG.STORE_INVENTORY의 각 itemId를 돌면서 구매아이템버튼 만들기
+    const storeItems = DATA.CONFIG.STORE_INVENTORY;
+
+    // 4. 반복문을 돌면서 배열에 있는 itemId를 하나씩 꺼내 만들기
+    storeItems.forEach((itemId) => {
+        const item = DATA.ITEMS[itemId];
+
+        // 5. 버튼 컨테이너에 추가
+        container.appendChild(renderBuyItemButton(itemId));
+    });
 }
 
 // ═══════════════════════════════════════════════
@@ -329,7 +415,17 @@ function renderSellItemButton(itemId) {
 }
 
 function renderSellItemList() {
-    // 여기 채우기
+    //1. 컨테이너 가져오기
+    const container = $("shop-sell-section");
+
+    //2. 기존 버튼 다 지우기 
+    container.innerHTML = "";
+
+    //3. STATE.inventory.slots 의 각 슬롯을 돌면서 판매아이템버튼 만들기 
+    //   1) - 슬롯이 null 이면?
+    //    2)- 슬롯의아이템이 가격이 없다면? 건너뛰기
+   //    3)- 버튼을 만들어서 container 에 붙이기 
+    container.appendChild(renderSellItemButton(slot));
 }
 
 // ═══════════════════════════════════════════════════════
