@@ -22,6 +22,7 @@ const STATE = {
     // 각 슬롯: null (빈 칸) 또는 { itemId, count }
     field: null,
     character: null, // Character 인스턴스 (resetGameState 에서 생성)
+    upgrades: {}, // { house: Upgradable, clothes: Upgradable } - resetGameState 에서 채움
 };
 
 // ═══════════════════════════════════════════════
@@ -50,4 +51,11 @@ function resetGameState() {
 
     //  새 밭 인스턴스 생성
     STATE.field = new Field();
+
+    // 업그레이더블 재산 초기화 (집, 옷 등) — DATA 정의된 모든 재산을 자동으로 등록.
+    // TODO 미래: 저장/로드 도입 시 저장된 레벨로 복원.
+    STATE.upgrades = {};
+    for (const [id, def] of Object.entries(DATA.UPGRADABLE_PROPERTIES)) {
+        STATE.upgrades[id] = new Upgradable(def);
+    }
 }

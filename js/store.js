@@ -36,6 +36,15 @@
 // ═══════════════════════════════════════════════
 // 1. 헬퍼 함수 (Helpers)
 // ═══════════════════════════════════════════════
+/**
+ * 상점 상단의 메시지 영역에 문자열을 표시한다.
+ * 성공/실패/안내 등 어떤 케이스든 같은 함수 호출.
+ * 빈 문자열을 넘기면 메시지 영역을 비운다.
+ * @param {string} messageString
+ */
+function displayStoreMessage(messageString) {
+    $("store-message").textContent = messageString;
+}
 
 /**
  * 가진 돈으로 가격을 낼 수 있는지 확인한다.
