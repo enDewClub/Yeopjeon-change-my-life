@@ -91,6 +91,28 @@ const DATA = {
             HARVEST_MIN: 1, // 수확량 최소
             HARVEST_MAX: 9, // 수확량 최대
         },
+        // 맵 영역 크기 (tokens.css 의 --canvas-width/height 와 동일 유지)
+        MAP_WIDTH: 960,
+        MAP_HEIGHT: 540,
+
+        // 캐릭터 설정값
+        CHARACTER: {
+            WIDTH: 500 / 3, // 화면 표시 너비 (원본 500x600 비율 무시, 정사각 표시)
+            HEIGHT: 600 / 3, // 화면 표시 높이
+            SPEED: 400, // 이동 속도 (픽셀/초). 숫자 키우면 빨라짐.
+            IMAGE: "img_assets/characters/player_character_shade.png",
+        },
+
+        // 근접 상호작용 거리 설정 (캐릭터 중심점 ↔ 버튼 중심점, Euclidean 거리, 픽셀)
+        // 캐릭터가 이 반경 안에 있어야 버튼 클릭 가능. 멀면 흐리게 + 클릭 비활성.
+        // 숫자만 바꾸면 즉시 반영됨.
+        PROXIMITY: {
+            EXIT_RADIUS: 120, // 출구 버튼 (.exit-btn)
+            SPECIAL_RADIUS: 120, // 특수 액션 버튼 (입궁하기, 상점 들어가기)
+            FIELD_RADIUS: 150, // 밭 관련 (셀, 물주기, 수확하기)
+        },
+
+        STORE_INVENTORY: ["potato_seed", "garlic_seed", "tomato_seed"],
     },
 
     // ═══════════════════════════════════════════════
@@ -109,6 +131,7 @@ const DATA = {
         home: {
             displayName: "집터",
             bgImage: "img_assets/bg/home.png",
+            characterStart: { x: 440, y: 230 }, // 맵 가운데 (960/2-40, 540/2-40)
             exits: {
                 left: "village", // 왼쪽 → 마을
                 right: "field", // 오른쪽 → 밭
@@ -119,6 +142,7 @@ const DATA = {
         village: {
             displayName: "마을 중심",
             bgImage: "img_assets/bg/village.png",
+            characterStart: { x: 440, y: 230 }, // 맵 가운데. 필요 시 여기 좌표만 수정.
             exits: {
                 right: "home",
                 left: "palace",
@@ -133,6 +157,7 @@ const DATA = {
         palace: {
             displayName: "궁궐",
             bgImage: "img_assets/bg/palace.png",
+            characterStart: { x: 440, y: 230 }, // 맵 가운데. 필요 시 여기 좌표만 수정.
             exits: {
                 right: "village", // 오른쪽 → 마을
             },
@@ -147,6 +172,7 @@ const DATA = {
         field: {
             displayName: "밭",
             bgImage: "img_assets/bg/field.png",
+            characterStart: { x: 440, y: 60 }, // 상단 출구 근처 (집터에서 진입한 느낌).
             exits: {
                 top: "home", // 위쪽 → 집터 (밭에서 나가기)
             },

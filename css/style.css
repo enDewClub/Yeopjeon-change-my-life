@@ -419,6 +419,18 @@ body {
     object-fit: contain;
 }
 
+#store-message {
+    height: var(--message-area-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-4);
+    background-color: var(--neutral-0);
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+}
 /* ═══════════════════════════════════════════════
    밭 맵 UI (#map-interactables 안에 동적 생성됨)
    ═══════════════════════════════════════════════ */
@@ -552,4 +564,37 @@ body {
 .special-action-btn:hover {
     background-color: var(--primary-700);
     color: var(--text-inverse);
+}
+
+/* ═══════════════════════════════════════════════
+   캐릭터 — 맵 안에서 키보드로 움직이는 플레이어
+   transform 으로 위치 갱신 (left/top 보다 GPU 친화적)
+   ═══════════════════════════════════════════════ */
+#character {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    user-select: none;
+    display: none; /* 기본 숨김 — characterStart 있는 맵에서만 보임 */
+}
+
+/* ═══════════════════════════════════════════════
+   근접 상호작용 비활성화
+   캐릭터가 너무 멀면 흐리게 표시 + 클릭 자체 차단.
+   ui.js 의 refreshProximityStates 가 매 프레임 클래스 토글.
+   거리 임계값은 data.js 의 DATA.CONFIG.PROXIMITY 에서 조정.
+
+   .out-of-range 단독 셀렉터 대신 명시적 결합(.exit-btn.out-of-range)을
+   쓰는 이유: 베이스 규칙(.exit-btn { pointer-events: auto } 등)의
+   특이도(specificity)를 확실히 이기기 위함.
+   ═══════════════════════════════════════════════ */
+.exit-btn.out-of-range,
+.special-action-btn.out-of-range,
+.field-cell.out-of-range,
+#btn-water.out-of-range,
+#btn-harvest.out-of-range {
+    opacity: 0.4;
+    pointer-events: none; /* 클릭 이벤트 자체가 안 발생 → JS 가드 불필요 */
+    cursor: default;
 }

@@ -157,6 +157,61 @@ window.addEventListener("DOMContentLoaded", () => {
     renderSelectedItemMessage();
 
     // ═══════════════════════════════════════════════
+    // 키보드 입력 — 눌린 키 집합 관리
+    // keydown/keyup 으로 Set 에 추가/제거 → 매 프레임 게임 루프가 읽음.
+    // WASD + 화살표 둘 다 지원.
+    // ═══════════════════════════════════════════════
+    const pressedKeys = new Set();
+    window.addEventListener("keydown", (e) => {
+        pressedKeys.add(e.key.toLowerCase());
+    });
+    window.addEventListener("keyup", (e) => {
+        pressedKeys.delete(e.key.toLowerCase());
+    });
+
+    /**
+     * 눌린 키에서 이동 벡터 뽑아서 캐릭터 이동.
+     * 대각선은 정규화해서 속도 일정 유지 (안 하면 √2 배 빨라짐).
+     */
+    function updateCharacterFromInput(delta) {
+        let dx = 0;
+        let dy = 0;
+        if (pressedKeys.has("arrowleft") || pressedKeys.has("a")) dx -= 1;
+        if (pressedKeys.has("arrowright") || pressedKeys.has("d")) dx += 1;
+        if (pressedKeys.has("arrowup") || pressedKeys.has("w")) dy -= 1;
+        if (pressedKeys.has("arrowdown") || pressedKeys.has("s")) dy += 1;
+
+        if (dx === 0 && dy === 0) return;
+
+        // 대각선 정규화
+        const length = Math.hypot(dx, dy);
+        dx /= length;
+        dy /= length;
+
+        const distance = DATA.CONFIG.CHARACTER.SPEED * delta;
+        STATE.character.move(dx * distance, dy * distance);
+    }
+
+    // ═══════════════════════════════════════════════
+    // 게임 루프 (requestAnimationFrame, ~60fps)
+    // - delta 시간 기반 → 프레임 드랍 있어도 속도 일정
+    // - 게임 씬 + 캐릭터 다니는 맵에서만 작동 (다른 씬에선 무시)
+    // ═══════════════════════════════════════════════
+    let lastFrameTime = performance.now();
+    function gameLoop(now) {
+        const delta = (now - lastFrameTime) / 1000;
+        lastFrameTime = now;
+
+        if (STATE.currentScene === "game" && STATE.character) {
+            updateCharacterFromInput(delta);
+            renderCharacter();
+            refreshProximityStates(); // 매 프레임 버튼 활성/비활성 갱신
+        }
+        requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
+
+    // ═══════════════════════════════════════════════
     // 밭 성장 틱 (0.5초마다)
     // - growing 상태면 시간 체크 후 ready 로 자동 전환
     // - 타이머 숫자만 가볍게 업데이트 (전체 리렌더 X)

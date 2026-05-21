@@ -192,3 +192,65 @@ function renderField() {
         container.appendChild(harvestBtn);
     }
 }
+
+// ═══════════════════════════════════════════════
+// 캐릭터 위치 반영 — 매 프레임 호출됨 (game.js 의 rAF 루프)
+// 가볍게 유지: transform 만 갱신. src/크기/표시여부는 map.js 가 맵 진입 시 한 번만.
+// ═══════════════════════════════════════════════
+function renderCharacter() {
+    if (!STATE.character) return;
+    const charEl = $("character");
+    charEl.style.transform = `translate(${STATE.character.x}px, ${STATE.character.y}px)`;
+}
+
+// ═══════════════════════════════════════════════
+// 근접 상호작용 체크 — 매 프레임 호출 (game.js 의 rAF 루프)
+//
+// 거리 계산: 캐릭터 중심점 ↔ 버튼 중심점, Euclidean (√(dx² + dy²)).
+// 버튼이 반경 밖이면 .out-of-range 클래스 추가 → CSS 가 흐리게 + 클릭 차단.
+// 반경 값은 data.js 의 DATA.CONFIG.PROXIMITY 에서만 관리.
+// ═══════════════════════════════════════════════
+function refreshProximityStates() {
+    if (!STATE.character) return;
+
+    const map = DATA.MAPS[STATE.currentMap];
+
+    // 캐릭터 없는 맵 → 잔여 .out-of-range 클래스 모두 제거 (방어 코드)
+    if (!map?.characterStart) {
+        document
+            .querySelectorAll(".out-of-range")
+            .forEach((el) => el.classList.remove("out-of-range"));
+        return;
+    }
+
+    const cx = STATE.character.getCenterX();
+    const cy = STATE.character.getCenterY();
+
+    // 버튼 위치는 뷰포트 기준이라 #map-area 기준으로 환산
+    const mapRect = $("map-area").getBoundingClientRect();
+
+    const check = (el, radius) => {
+        const r = el.getBoundingClientRect();
+        const ex = r.left - mapRect.left + r.width / 2;
+        const ey = r.top - mapRect.top + r.height / 2;
+        const distance = Math.hypot(ex - cx, ey - cy);
+        el.classList.toggle("out-of-range", distance > radius);
+    };
+
+    const { EXIT_RADIUS, SPECIAL_RADIUS, FIELD_RADIUS } = DATA.CONFIG.PROXIMITY;
+
+    document
+        .querySelectorAll(".exit-btn")
+        .forEach((el) => check(el, EXIT_RADIUS));
+    document
+        .querySelectorAll(".special-action-btn")
+        .forEach((el) => check(el, SPECIAL_RADIUS));
+    document
+        .querySelectorAll(".field-cell")
+        .forEach((el) => check(el, FIELD_RADIUS));
+
+    const water = $("btn-water");
+    if (water) check(water, FIELD_RADIUS);
+    const harvest = $("btn-harvest");
+    if (harvest) check(harvest, FIELD_RADIUS);
+}
