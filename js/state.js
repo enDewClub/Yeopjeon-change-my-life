@@ -21,6 +21,7 @@ const STATE = {
     inventory: null, // Inventory 인스턴스 (resetGameState 에서 생성)
     // 각 슬롯: null (빈 칸) 또는 { itemId, count }
     field: null,
+    character: null, // Character 인스턴스 (resetGameState 에서 생성)
 };
 
 // ═══════════════════════════════════════════════
@@ -35,6 +36,9 @@ const STATE = {
 function resetGameState() {
     STATE.currentMap = DATA.CONFIG.STARTING_MAP;
     STATE.money = DATA.CONFIG.STARTING_MONEY;
+
+    // 새 캐릭터 인스턴스 생성 (위치는 renderMap 이 맵별 시작점으로 세팅)
+    STATE.character = new Character();
 
     // 새 인벤토리 생성 (이전 인벤토리는 가비지 컬렉터가 알아서 정리)
     STATE.inventory = new Inventory(DATA.CONFIG.INVENTORY_SIZE);

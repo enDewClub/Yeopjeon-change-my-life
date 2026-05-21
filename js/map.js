@@ -32,6 +32,9 @@ function renderMap(mapId) {
     // (renderField 가 내부에서 clear + 재렌더 처리. 밭 맵이 아니면 자동으로 비움)
     $("map-interactables").innerHTML = "";
     renderField();
+
+    //맵 진입 시 캐릭터 세팅 (위치 리셋이 일어나는 곳)
+    setupCharacterForMap(map);
 }
 
 // ═══════════════════════════════════════════════
@@ -45,6 +48,34 @@ function setMapBackground(map) {
     const bg = $("map-bg");
     bg.src = map.bgImage;
     bg.alt = map.displayName;
+}
+// ═══════════════════════════════════════════════
+// 캐릭터를 현재 맵에 맞게 세팅
+// - characterStart 가 있는 맵: 시작 위치로 옮기고 표시
+// - 없는 맵: 숨김
+//
+// 매번 시작 위치로 리셋되는 동작이 여기서 일어남.
+// (나중에 "들어온 방향에 따라 위치 다르게" 로 바꾸려면 이 함수만 손보면 됨)
+// ═══════════════════════════════════════════════
+function setupCharacterForMap(map) {
+    const charEl = $("character");
+
+    // 캐릭터 다니지 않는 맵 → 숨기고 끝
+    if (!map.characterStart) {
+        charEl.style.display = "none";
+        return;
+    }
+
+    // 캐릭터 다니는 맵 → src/크기 세팅 후 표시
+    const { WIDTH, HEIGHT, IMAGE } = DATA.CONFIG.CHARACTER;
+    charEl.src = IMAGE;
+    charEl.style.width = `${WIDTH}px`;
+    charEl.style.height = `${HEIGHT}px`;
+    charEl.style.display = "block";
+
+    // 시작 위치로 이동 + 초기 한 번 렌더
+    STATE.character.setPosition(map.characterStart.x, map.characterStart.y);
+    renderCharacter();
 }
 
 // ═══════════════════════════════════════════════
