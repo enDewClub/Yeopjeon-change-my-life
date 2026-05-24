@@ -160,11 +160,11 @@ const DATA = {
             "potato_seed",
             "garlic_seed",
             "tomato_seed",
-            "carrot_seed",
-            "sweetPotato_seed",
-            "magic_book_1",
-            "magic_silk_1",
-            "honey_tteock",
+            // "carrot_seed",
+            // "sweetPotato_seed",
+            // "magic_book_2",
+            // "magic_silk_2",
+            // "honey_tteock",
         ],
     },
 
@@ -218,6 +218,11 @@ const DATA = {
             specialAction: {
                 label: "입궁하기",
                 actionType: "goEnding",
+                // 입궁 조건. 여러 조건은 모두 만족해야 함 (AND).
+                // 새 조건 추가 = 객체 하나 더 푸시 — 다른 코드 수정 없음.
+                // TODO Stage 2: 옷 조건 추가 시 { upgradableId: "clothes", minLevel: 3 } 한 줄 추가
+                requires: [{ upgradableId: "house", minLevel: 2 }],
+                lockedLabel: "입궁 자격 부족",
             },
         },
 
@@ -248,14 +253,19 @@ const DATA = {
     UPGRADABLE_PROPERTIES: defineUpgradableProperties({
         house: {
             displayName: "집",
-            // TODO Stage 2: 배경 분리 후 { mapId, x, y, width, height } 로 위치/크기 지정
-            // 지금은 home 맵 배경 자체를 통째로 교체하는 방식
-            renderLocation: { mapId: "home" },
+            // home 맵 위에 별도 이미지 레이어로 띄움 (배경 분리됨, 투명 PNG 사용)
+            renderLocation: {
+                mapId: "home",
+                x: 580,
+                y: 100,
+                width: 280,
+                height: 280,
+            },
             startLevel: 1,
             levels: [
                 { level: 1, displayName: "초가집" },
-                { level: 2, displayName: "기와집" },
-                { level: 3, displayName: "양옥" },
+                { level: 2, displayName: "초가기와집" },
+                { level: 3, displayName: "기와집" },
             ],
         },
         clothes: {
@@ -337,34 +347,34 @@ const DATA = {
             },
         },
         consumables: {
-            magic_book_1: {
+            magic_book_2: {
                 displayName: "비법서",
                 description: "집을 기와집으로 만들어준다",
                 buyPrice: 200,
                 consumedAt: "purchase",
                 effect: { kind: "upgrade", targetId: "house", toLevel: 2 },
             },
-            magic_book_2: {
-                displayName: "비법서",
-                description: "집을 양옥으로 만들어준다",
-                buyPrice: 500,
-                consumedAt: "purchase",
-                effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
-            },
-            magic_silk_1: {
-                displayName: "신비한 비단",
-                description: "무명옷으로 갈아입혀준다",
-                buyPrice: 150,
-                consumedAt: "purchase",
-                effect: { kind: "upgrade", targetId: "clothes", toLevel: 2 },
-            },
-            magic_silk_2: {
-                displayName: "신비한 비단",
-                description: "비단옷으로 갈아입혀준다",
-                buyPrice: 400,
-                consumedAt: "purchase",
-                effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
-            },
+            // magic_book_3: {
+            //     displayName: "비법서",
+            //     description: "집을 양옥으로 만들어준다",
+            //     buyPrice: 500,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
+            // },
+            // magic_silk_2: {
+            //     displayName: "신비한 비단",
+            //     description: "무명옷으로 갈아입혀준다",
+            //     buyPrice: 150,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 2 },
+            // },
+            // magic_silk_3: {
+            //     displayName: "신비한 비단",
+            //     description: "비단옷으로 갈아입혀준다",
+            //     buyPrice: 400,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
+            // },
         },
     }),
 };

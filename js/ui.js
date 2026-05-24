@@ -45,6 +45,9 @@ function switchScene(sceneName) {
  */
 function renderMoney() {
     $("money-amount").textContent = STATE.money;
+
+    // 상점안에서 TODO 둘이 통일하기
+    $("store-money-amount").textContent = STATE.money;
 }
 
 // ═══════════════════════════════════════════════
@@ -190,6 +193,44 @@ function renderField() {
         harvestBtn.id = "btn-harvest";
         harvestBtn.textContent = "수확하기";
         container.appendChild(harvestBtn);
+    }
+}
+// ═══════════════════════════════════════════════
+// 맵 위 업그레이더블 렌더 (집 등 — renderLocation.mapId 가 있는 것들)
+//
+// 현재 맵 (STATE.currentMap) 에 배치되는 모든 업그레이더블을 그린다.
+// 각 업그레이더블은 컨테이너 div + 자식 레이어 img 구조 (캐릭터와 동일 패턴).
+// 미래에 굴뚝 연기/간판 같은 추가 레이어는 컨테이너에 자식으로 더 붙이면 됨.
+// ═══════════════════════════════════════════════
+function renderUpgradablesForMap() {
+    const container = $("map-interactables");
+
+    for (const id in STATE.upgrades) {
+        const upgradable = STATE.upgrades[id];
+        const loc = upgradable.definition.renderLocation;
+
+        // 현재 맵에 배치되는 것만 (mapId 매칭).
+        // 옷처럼 캐릭터에 입는 건 setupCharacterForMap 이 처리하므로 여기선 스킵.
+        if (loc?.mapId !== STATE.currentMap) continue;
+
+        // 컨테이너 div — 위치/크기는 여기서 결정
+        const wrapper = document.createElement("div");
+        wrapper.className = "map-upgradable";
+        wrapper.dataset.upgradableId = id; // 디버깅 / 미래 조회용
+        wrapper.style.left = `${loc.x}px`;
+        wrapper.style.top = `${loc.y}px`;
+        wrapper.style.width = `${loc.width}px`;
+        wrapper.style.height = `${loc.height}px`;
+
+        // 메인 레이어 img (현재 레벨의 이미지)
+        const mainLayer = document.createElement("img");
+        mainLayer.className = "upgradable-layer";
+        mainLayer.src = upgradable.getCurrentLevelData().image;
+        wrapper.appendChild(mainLayer);
+
+        // 미래: 추가 레이어 (굴뚝 연기, 간판 등) 여기에 더 appendChild
+
+        container.appendChild(wrapper);
     }
 }
 
