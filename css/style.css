@@ -598,3 +598,38 @@ body {
     pointer-events: none; /* 클릭 이벤트 자체가 안 발생 → JS 가드 불필요 */
     cursor: default;
 }
+
+/* 특수 액션 조건 미충족 (예: 입궁 자격 부족) — 흐리게 + 클릭 차단 */
+.special-action-btn.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.6);
+}
+/* ═══════════════════════════════════════════════
+   캐릭터 레이어 — 컨테이너를 꽉 채우는 자식 이미지들
+   (베이스 / 옷 / 추후 모자 등)
+   ═══════════════════════════════════════════════ */
+.character-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   맵 위 업그레이더블 (집 등) — 컨테이너
+   위치/크기는 JS 가 인라인 style 로 지정 (data 에서 옴)
+   ═══════════════════════════════════════════════ */
+.map-upgradable {
+    position: absolute;
+    pointer-events: none;
+}
+
+/* 업그레이더블 레이어 — 컨테이너를 꽉 채우는 자식 이미지들 */
+.upgradable-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}

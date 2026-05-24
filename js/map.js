@@ -18,25 +18,23 @@
  */
 function renderMap(mapId) {
     const map = DATA.MAPS[mapId];
-
-    // STATE 업데이트 - 현재 어느 맵인지 기록
     STATE.currentMap = mapId;
 
-    // 1. 배경 이미지 설정
+    // 1. 배경 이미지
     setMapBackground(map);
 
-    // 2. 출구 + 특수 버튼 생성
+    // 2. 출구 + 특수 버튼
     renderMapButtons(map);
 
-    // 3. 상호작용 요소 초기화 (Step 1+ 에서 밭/채집식물 등 채울 곳)
-    // (renderField 가 내부에서 clear + 재렌더 처리. 밭 맵이 아니면 자동으로 비움)
+    // 3. 상호작용 요소 비우고 → 각 종류별 추가
+    //    순서 주의: renderField 가 내부에서 또 비우므로 upgradables 보다 먼저 호출.
     $("map-interactables").innerHTML = "";
-    renderField();
+    renderField(); // 밭 셀 (밭 맵일 때만 내용 추가, 아니면 no-op)
+    renderUpgradablesForMap(); // 집 등 (현재 맵에 배치된 것들)
 
-    //맵 진입 시 캐릭터 세팅 (위치 리셋이 일어나는 곳)
+    // 4. 캐릭터 (위치 리셋 + 베이스/옷 src 세팅)
     setupCharacterForMap(map);
 }
-
 // ═══════════════════════════════════════════════
 // 배경 이미지
 // ═══════════════════════════════════════════════
@@ -66,12 +64,19 @@ function setupCharacterForMap(map) {
         return;
     }
 
-    // 캐릭터 다니는 맵 → src/크기 세팅 후 표시
     const { WIDTH, HEIGHT, IMAGE } = DATA.CONFIG.CHARACTER;
-    charEl.src = IMAGE;
+
+    // 크기는 컨테이너에 (자식 레이어들은 CSS inset:0 으로 따라옴)
     charEl.style.width = `${WIDTH}px`;
     charEl.style.height = `${HEIGHT}px`;
     charEl.style.display = "block";
+
+    // 각 레이어 src 설정
+    //   베이스: 변하지 않는 캐릭터 본체
+    //   옷: 현재 옷 레벨에 맞는 투명 PNG 오버레이
+    $("character-base").src = IMAGE;
+    $("character-clothes").src =
+        STATE.upgrades.clothes.getCurrentLevelData().image;
 
     // 시작 위치로 이동 + 초기 한 번 렌더
     STATE.character.setPosition(map.characterStart.x, map.characterStart.y);
@@ -127,13 +132,35 @@ function createExitButton(direction, targetMapId) {
 function createSpecialActionButton(specialAction) {
     const btn = document.createElement("button");
     btn.className = "special-action-btn";
-    btn.textContent = specialAction.label;
 
-    btn.addEventListener("click", () =>
-        handleSpecialAction(specialAction.actionType),
-    );
+    // 조건 충족 여부에 따라 라벨 / 잠금 클래스 결정
+    const unlocked = isSpecialActionUnlocked(specialAction);
+    btn.textContent = unlocked
+        ? specialAction.label
+        : (specialAction.lockedLabel ?? specialAction.label);
+
+    if (!unlocked) btn.classList.add("locked");
+
+    btn.addEventListener("click", () => {
+        // 잠금 상태면 클릭 무시 (방어 코드 — CSS 가 시각적으로도 막지만 JS 도 막음)
+        if (!isSpecialActionUnlocked(specialAction)) return;
+        handleSpecialAction(specialAction.actionType);
+    });
 
     return btn;
+}
+// ═══════════════════════════════════════════════
+// 특수 액션의 조건이 모두 충족됐는지 검사 (AND).
+// requires 배열이 없거나 비어있으면 항상 통과.
+// 새 조건 종류 추가하려면 여기에 분기 추가 (지금은 upgradable 레벨만 지원).
+// ═══════════════════════════════════════════════
+function isSpecialActionUnlocked(specialAction) {
+    if (!specialAction.requires) return true;
+
+    return specialAction.requires.every((req) => {
+        const upgradable = STATE.upgrades[req.upgradableId];
+        return upgradable && upgradable.currentLevel >= req.minLevel;
+    });
 }
 
 /**

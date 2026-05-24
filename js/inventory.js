@@ -62,6 +62,9 @@ class Inventory {
         }
 
         this.slotsArray[emptyIndex] = { itemId, count };
+        console.log(
+            "Added stuff to my inventory!" + STATE.inventory.slotsArray,
+        );
         return true;
     }
 

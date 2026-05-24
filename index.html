@@ -43,8 +43,22 @@
                     <!-- 맵 상호작용 요소 (밭, 채집식물 등 - Step1+ 에서 사용) -->
                     <div id="map-interactables"></div>
 
-                    <!-- 캐릭터 이미지 (JS 의 renderCharacter 에서 transform/src 설정) -->
-                    <img id="character" src="" alt="" />
+                    <!-- 캐릭터 컨테이너: 위치는 여기에. 자식 레이어들은 이 안에서 100% 로 채움 -->
+                    <div id="character">
+                        <img
+                            id="character-base"
+                            class="character-layer"
+                            src=""
+                            alt=""
+                        />
+                        <img
+                            id="character-clothes"
+                            class="character-layer"
+                            src=""
+                            alt=""
+                        />
+                        <!-- hat would come after clothes. -->
+                    </div>
 
                     <!-- 출구 버튼들 (JS에서 동적 생성) -->
                     <div id="map-exits"></div>
@@ -113,10 +127,12 @@
         <script src="js/field.js"></script>
         <script src="js/character.js"></script>
         <script src="js/upgradable.js"></script>
+
         <script src="js/state.js"></script>
         <script src="js/ui.js"></script>
         <script src="js/map.js"></script>
         <script src="js/game.js"></script>
         <script src="js/store.js"></script>
+        <script src="js/store_upgradable.js"></script>
     </body>
 </html>

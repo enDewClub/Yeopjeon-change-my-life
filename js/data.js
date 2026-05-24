@@ -35,7 +35,12 @@
 // 규칙에서 벗어나는 아이템은 def 에 직접 필드 넣으면 자동값을 덮어씀.
 //   예: { ..., icon: "img_assets/items/special/magic_book.png" }
 // ═══════════════════════════════════════════════════════
-function defineItems({ seeds = {}, crops = {}, folder = "farm" }) {
+function defineItems({
+    seeds = {},
+    crops = {},
+    consumables = {},
+    folder = "farm",
+}) {
     const items = {};
 
     // 경로 생성 단축 함수
@@ -66,7 +71,46 @@ function defineItems({ seeds = {}, crops = {}, folder = "farm" }) {
         };
     }
 
+    // ─── Consumable 처리 ──────────────────────────
+    // farm 폴더와 별개로 special 폴더 사용 (씨앗/작물과 시각적으로 구분)
+    for (const [id, def] of Object.entries(consumables)) {
+        items[id] = {
+            id,
+            type: "consumable",
+            icon: `img_assets/items/special/${id}.png`,
+            ...def, // 사용자가 넘긴 필드가 자동값보다 우선
+        };
+    }
+
     return items;
+}
+
+// ═══════════════════════════════════════════════════════
+// 업그레이더블 재산 정의 헬퍼 (Upgradable Property Factory)
+//
+// 집, 옷 같이 레벨업되는 재산을 정의.
+// 이미지 경로는 폴더 규칙대로 자동 생성:
+//   img_assets/upgradables/{id}/{level}.png
+// 규칙에서 벗어나면 levels 안의 원소에 image 직접 넣으면 덮어쓰기 가능.
+// ═══════════════════════════════════════════════════════
+function defineUpgradableProperties(definitions) {
+    const result = {};
+
+    for (const [id, def] of Object.entries(definitions)) {
+        // 각 레벨에 자동 이미지 경로 부여 (이미 있으면 유지)
+        const levels = def.levels.map((lvl) => ({
+            image: `img_assets/upgradables/${id}/${lvl.level}.png`,
+            ...lvl,
+        }));
+
+        result[id] = {
+            id,
+            ...def,
+            levels,
+        };
+    }
+
+    return result;
 }
 
 const DATA = {
@@ -112,7 +156,16 @@ const DATA = {
             FIELD_RADIUS: 150, // 밭 관련 (셀, 물주기, 수확하기)
         },
 
-        STORE_INVENTORY: ["potato_seed", "garlic_seed", "tomato_seed"],
+        STORE_INVENTORY: [
+            "potato_seed",
+            "garlic_seed",
+            "tomato_seed",
+            // "carrot_seed",
+            // "sweetPotato_seed",
+            // "magic_book_2",
+            // "magic_silk_2",
+            // "honey_tteock",
+        ],
     },
 
     // ═══════════════════════════════════════════════
@@ -165,6 +218,11 @@ const DATA = {
             specialAction: {
                 label: "입궁하기",
                 actionType: "goEnding",
+                // 입궁 조건. 여러 조건은 모두 만족해야 함 (AND).
+                // 새 조건 추가 = 객체 하나 더 푸시 — 다른 코드 수정 없음.
+                // TODO Stage 2: 옷 조건 추가 시 { upgradableId: "clothes", minLevel: 3 } 한 줄 추가
+                requires: [{ upgradableId: "house", minLevel: 2 }],
+                lockedLabel: "입궁 자격 부족",
             },
         },
 
@@ -178,6 +236,52 @@ const DATA = {
             },
         },
     },
+
+    // ═══════════════════════════════════════════════
+    // 3. UPGRADABLE_PROPERTIES - 캐릭터의 업그레이드 가능한 재산
+    //
+    // 인벤토리 아이템(ITEMS)과 별개. 수량 개념 없고, 항상 하나만 존재하며 레벨이 있음.
+    //   예: 집(초가집 → 기와집 → 양옥), 옷(누더기 → 무명옷 → 비단옷)
+    //
+    // 새 재산 추가 = 여기에 객체 하나 추가하면 끝.
+    // 레벨업 효과는 ITEMS 의 consumable 이 effect.targetId 로 가리킴.
+    //
+    // renderLocation 종류:
+    //   { mapId: "home" }       → 해당 맵에 배치 (집, 우물 등)
+    //   { on: "character" }     → 캐릭터에 입힘 (옷, 모자 등)
+    // ═══════════════════════════════════════════════
+    UPGRADABLE_PROPERTIES: defineUpgradableProperties({
+        house: {
+            displayName: "집",
+            // home 맵 위에 별도 이미지 레이어로 띄움 (배경 분리됨, 투명 PNG 사용)
+            renderLocation: {
+                mapId: "home",
+                x: 580,
+                y: 100,
+                width: 280,
+                height: 280,
+            },
+            startLevel: 1,
+            levels: [
+                { level: 1, displayName: "초가집" },
+                { level: 2, displayName: "초가기와집" },
+                { level: 3, displayName: "기와집" },
+            ],
+        },
+        clothes: {
+            displayName: "옷",
+            // TODO Stage 2: 레이어드 스프라이트 (베이스 + 옷 오버레이) 로 전환
+            // 지금은 캐릭터 이미지 자체를 통째로 교체
+            renderLocation: { on: "character" },
+            startLevel: 1,
+            levels: [
+                { level: 1, displayName: "누더기" },
+                { level: 2, displayName: "무명옷" },
+                { level: 3, displayName: "비단옷" },
+            ],
+        },
+    }),
+
     // ═══════════════════════════════════════════════
     // 3. ITEMS - 모든 아이템 정의
     //
@@ -241,6 +345,36 @@ const DATA = {
                 description: "수확한 토마토",
                 sellPrice: 5,
             },
+        },
+        consumables: {
+            magic_book_2: {
+                displayName: "비법서",
+                description: "집을 기와집으로 만들어준다",
+                buyPrice: 200,
+                consumedAt: "purchase",
+                effect: { kind: "upgrade", targetId: "house", toLevel: 2 },
+            },
+            // magic_book_3: {
+            //     displayName: "비법서",
+            //     description: "집을 양옥으로 만들어준다",
+            //     buyPrice: 500,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
+            // },
+            // magic_silk_2: {
+            //     displayName: "신비한 비단",
+            //     description: "무명옷으로 갈아입혀준다",
+            //     buyPrice: 150,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 2 },
+            // },
+            // magic_silk_3: {
+            //     displayName: "신비한 비단",
+            //     description: "비단옷으로 갈아입혀준다",
+            //     buyPrice: 400,
+            //     consumedAt: "purchase",
+            //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
+            // },
         },
     }),
 };
