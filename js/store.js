@@ -181,6 +181,9 @@ function onBuyClick(itemId) {
             STATE.money += selectedItem.buyPrice;
             return;
         }
+        // 성공시 차감
+        STATE.money = STATE.money - selectedItem.buyPrice;
+
         // 화면 갱신: 소지금 + 구매목록(돈 변동으로 affordability 변함) + 판매목록(살 수 있는 작물 산 경우 대비)
         renderMoney();
         renderBuyItemList();
