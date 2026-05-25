@@ -183,7 +183,7 @@ const DATA = {
         // 집터 - 게임 시작 위치
         home: {
             displayName: "집터",
-            bgImage: "img_assets/bg/home.png",
+            bgImage: "img_assets/bg/map_home.png",
             characterStart: { x: 440, y: 230 }, // 맵 가운데 (960/2-40, 540/2-40)
             exits: {
                 left: "village", // 왼쪽 → 마을
@@ -194,7 +194,7 @@ const DATA = {
         // 마을 중심 - 상점, 궁궐로 가는 통로
         village: {
             displayName: "마을 중심",
-            bgImage: "img_assets/bg/village.png",
+            bgImage: "img_assets/bg/map_village.png",
             characterStart: { x: 440, y: 230 }, // 맵 가운데. 필요 시 여기 좌표만 수정.
             exits: {
                 right: "home",
@@ -209,7 +209,7 @@ const DATA = {
         // 궁궐 - 입궁하면 엔딩
         palace: {
             displayName: "궁궐",
-            bgImage: "img_assets/bg/palace.png",
+            bgImage: "img_assets/bg/map_gyeongbokgung2.png",
             characterStart: { x: 440, y: 230 }, // 맵 가운데. 필요 시 여기 좌표만 수정.
             exits: {
                 right: "village", // 오른쪽 → 마을
@@ -256,8 +256,8 @@ const DATA = {
             // home 맵 위에 별도 이미지 레이어로 띄움 (배경 분리됨, 투명 PNG 사용)
             renderLocation: {
                 mapId: "home",
-                x: 580,
-                y: 100,
+                x: 380,
+                y: 15,
                 width: 280,
                 height: 280,
             },
