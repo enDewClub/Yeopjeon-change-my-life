@@ -23,6 +23,7 @@ const STATE = {
     field: null,
     character: null, // Character 인스턴스 (resetGameState 에서 생성)
     upgrades: {}, // { house: Upgradable, clothes: Upgradable } - resetGameState 에서 채움
+    storePopup: null, // 열려있으면 { mode: "buy"|"sell", itemId, count }, 닫혀있으면 null
 };
 
 // ═══════════════════════════════════════════════
@@ -58,4 +59,6 @@ function resetGameState() {
     for (const [id, def] of Object.entries(DATA.UPGRADABLE_PROPERTIES)) {
         STATE.upgrades[id] = new Upgradable(def);
     }
+
+    STATE.storePopup = null; // 팝업 닫힌 상태로 시작
 }

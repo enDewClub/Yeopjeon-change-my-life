@@ -633,3 +633,127 @@ body {
     width: 100%;
     height: 100%;
 }
+
+/* ─── 팝업 컨테이너 ───────────────────────── */
+#store-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #faf3e3;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* 비어있을 땐 자동으로 숨김 → closeStorePopup 이 innerHTML="" 만 해도 됨 */
+#store-popup:empty {
+    display: none;
+}
+
+/* ─── 왼쪽: 아이콘 + 이름 ──────────────────── */
+.store-popup-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 120px;
+}
+
+.store-popup-icon {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.store-popup-name {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ─── 오른쪽: 설명 + 카운터 + 버튼 ───────────── */
+.store-popup-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 240px;
+}
+
+.store-popup-description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* ─── 수량 카운터 ( − 1 + ) ────────────────── */
+.store-popup-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px solid #666;
+    border-radius: 999px;
+    padding: 4px 14px;
+    align-self: center;
+}
+
+.store-popup-minus,
+.store-popup-plus {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #666;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.store-popup-minus:disabled,
+.store-popup-plus:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.store-popup-count {
+    min-width: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* ─── 확정 / 취소 버튼 ────────────────────── */
+.store-popup-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.store-popup-cancel,
+.store-popup-confirm {
+    padding: 8px 20px;
+    border: 1.5px solid #333;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.store-popup-cancel:hover,
+.store-popup-confirm:hover:not(:disabled) {
+    background: #f0e8d4;
+}
+
+.store-popup-confirm:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

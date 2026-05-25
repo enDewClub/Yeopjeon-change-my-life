@@ -73,6 +73,30 @@ function calculateTotalPrice(itemPrice, count) {
 // console.log(calculateTotalPrice(0, 5));      // → 0   (공짜)
 // console.log(calculateTotalPrice(100, 10));   // → 1000
 
+/**
+ * 지금 살 수 있는 최대 갯수.
+ * 돈 한도와 인벤토리 빈 칸 한도 중 작은 쪽.
+ */
+function getMaxBuyCount(itemId) {
+    // 1. 가격으로 살 수 있는 최대 = floor(소지금 / 단가)
+    const item = DATA.ITEMS[itemId];
+    const moneyMax = Math.floor(STATE.money / item.buyPrice);
+
+    // 2. 같은 아이템 슬롯이 이미 있으면 칸 제약 없음 (스택), 없으면 빈 슬롯 하나 있어야 함
+    const alreadyHas = STATE.inventory.hasItem(itemId, 1);
+    const hasEmptySlot = STATE.inventory.slotsArray.some((s) => s === null);
+    const invMax = alreadyHas ? Infinity : hasEmptySlot ? Infinity : 0;
+
+    // 3. min(돈한도, 인벤한도) 반환. 0이면 0.
+    return Math.min(moneyMax, invMax);
+}
+
+/**
+ * 지금 팔 수 있는 최대 갯수 = 인벤에 있는 그 아이템 갯수.
+ */
+function getMaxSellCount(itemId) {
+    return STATE.inventory.getItemCount(itemId);
+}
 // ═══════════════════════════════════════════════
 // 2. 씬 진입/종료 + 단순 클릭 핸들러
 // ═══════════════════════════════════════════════
@@ -126,8 +150,14 @@ function onExitStoreClick() {
  * @param {string} itemId
  */
 function onBuyItemClick(itemId) {
-    // 1) 구매하기 함수 호출
-    onBuyClick(itemId);
+    // 1단계: 구매하기 함수 호출했었음
+    // onBuyClick(itemId);
+
+    // 2단계: 구매 팝업 띄우기
+    // consumable 이면 buyConsumable 모드, 아니면 buy
+    const item = DATA.ITEMS[itemId];
+    const mode = item.consumedAt === "purchase" ? "buyConsumable" : "buy";
+    showStorePopup(itemId, mode);
 }
 
 // ─── onBuyItemClick 테스트 (onBuyClick 과 결과 같아야 함) ──
@@ -142,8 +172,11 @@ function onBuyItemClick(itemId) {
  * @param {string} itemId
  */
 function onSellItemClick(itemId) {
-    // 1) 판매하기 함수 호출
-    onSellClick(itemId);
+    // 1단계: 판매하기 함수 호출했었음
+    // onSellClick(itemId);
+
+    // 2단계: 판매팝업 호출
+    showStorePopup(itemId, "sell");
 }
 
 // ─── onSellItemClick 테스트 (onSellClick 과 결과 같아야 함) ──
@@ -162,8 +195,11 @@ function onSellItemClick(itemId) {
  * 돈 부족하거나 인벤 꽉차면 메시지 표시 후 종료.
  * @param {string} itemId
  */
-function onBuyClick(itemId) {
+function onBuyClick(itemId, count) {
     let selectedItem = DATA.ITEMS[itemId];
+
+    // 총 가격 계산하기
+    let totalPrice = calculateTotalPrice(selectedItem.buyPrice, count);
 
     // 살 수 있는 돈이 있는지 체크 (가진 돈, 아이템 가격)
     if (isAffordable(STATE.money, selectedItem.buyPrice) === false) {
@@ -193,11 +229,10 @@ function onBuyClick(itemId) {
     } else {
         // 일반 아이템: 인벤토리에 추가
         // 1) 인벤토리에 아이템 1개 추가
-        let isAdded = STATE.inventory.addItem(itemId, 1);
+        let isAdded = STATE.inventory.addItem(itemId, count);
 
         // 2) 추가에 성공했을 때만 실제로 돈을 깎고 화면 갱신
         if (isAdded === true) {
-            let totalPrice = calculateTotalPrice(selectedItem.buyPrice, 1);
             STATE.money = STATE.money - totalPrice;
             // 화면 갱신: 소지금 + 구매목록(돈 변동으로 affordability 변함) + 판매목록(살 수 있는 작물 산 경우 대비)
             renderMoney();
@@ -205,6 +240,8 @@ function onBuyClick(itemId) {
             renderSellItemList();
             // 성공 메시지
             displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+            // 성공 시 팝업 닫기
+            closeStorePopup();
         } else {
             // addItem 이 false 를 리턴했다면 인벤토리가 꽉 찬 것
             displayStoreMessage("인벤토리가 꽉 차서 살 수 없습니다!");
@@ -248,11 +285,11 @@ function onBuyClick(itemId) {
  * 인벤에 없으면 아무 일도 안 함.
  * @param {string} itemId
  */
-function onSellClick(itemId) {
+function onSellClick(itemId, sellCount) {
     let selectedItem = DATA.ITEMS[itemId];
 
     // 1) 인벤토리에 해당 아이템이 몇 개 있는지 체크하기
-    let sellCount = STATE.inventory.getItemCount(itemId);
+    // let sellCount = STATE.inventory.getItemCount(itemId);
 
     // 2) 인벤토리에 아이템이 0개 이하로 있으면 아무 일도 안 함
     if (sellCount <= 0) {
@@ -282,6 +319,8 @@ function onSellClick(itemId) {
         displayStoreMessage(
             `판매 완료: ${selectedItem.displayName} ${sellCount}개 (+${totalEarned}푼)`,
         );
+        // 성공 시 팝업 닫기
+        closeStorePopup();
     }
 }
 
@@ -458,6 +497,216 @@ function renderSellItemList() {
 }
 
 // ═══════════════════════════════════════════════
+// 7. 팝업
+// ═══════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════
+// 2. 팝업 모드 → 행동 매핑 (mode 분기는 여기 한 곳만)
+// ═══════════════════════════════════════════════
+
+/**
+ * 현재 팝업의 max 갯수를 반환. mode 분기는 이 함수에서만 함.
+ * renderStorePopup 도, onAddCountClick 도 이 함수 호출.
+ */
+function getStorePopupMax() {
+    if (STATE.storePopup === null) return 0;
+
+    const { mode, itemId } = STATE.storePopup;
+    switch (mode) {
+        case "buy":
+            return getMaxBuyCount(itemId);
+        case "sell":
+            return getMaxSellCount(itemId);
+        case "buyConsumable":
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/**
+ * 팝업의 confirm 버튼이 눌렸을 때 실행할 액션.
+ * mode 별로 onBuyClick/onSellClick 호출.
+ */
+function onStoreConfirmClick() {
+    if (STATE.storePopup === null) return;
+    const { mode, itemId, count } = STATE.storePopup;
+    switch (mode) {
+        case "buy":
+        case "buyConsumable":
+            onBuyClick(itemId, count);
+            break;
+        case "sell":
+            onSellClick(itemId, count);
+            break;
+    }
+}
+/**
+ * 팝업 열기. modeType = "buy" | "sell" | "buyConsumable"
+ */
+function showStorePopup(itemId, modeType) {
+    STATE.storePopup = {
+        mode: modeType,
+        itemId: itemId,
+        count: 1,
+    };
+    renderStorePopup();
+}
+
+/**
+ * 팝업 닫기. 취소/구매성공/판매성공 모두 여기로.
+ */
+function closeStorePopup() {
+    STATE.storePopup = null;
+    $("store-popup").innerHTML = ""; // 또는 .classList.remove("active") — 렌더 방식에 맞춰
+}
+
+// ═══════════════════════════════════════════════
+// 5. 팝업 렌더
+// ═══════════════════════════════════════════════
+
+function renderStorePopup() {
+    const container = $("store-popup");
+    container.innerHTML = ""; // 매번 새로 그림
+
+    // 1. null 방어 (팝업 닫혀있으면 빈 채로 끝)
+    if (STATE.storePopup === null) return;
+
+    // 2. 상태 읽기
+    const { mode, itemId, count } = STATE.storePopup;
+    const item = DATA.ITEMS[itemId];
+    const max = getStorePopupMax();
+
+    // ─── 왼쪽 영역: 아이콘 + 이름 ───────────────
+    const left = document.createElement("div");
+    left.className = "store-popup-left";
+
+    const icon = document.createElement("img");
+    icon.className = "store-popup-icon";
+    icon.src = item.icon;
+    icon.alt = item.displayName;
+    left.appendChild(icon);
+
+    const name = document.createElement("div");
+    name.className = "store-popup-name";
+    name.textContent = item.displayName;
+    left.appendChild(name);
+
+    container.appendChild(left);
+
+    // ─── 오른쪽 영역: 설명 + 카운터 + 버튼 ───────
+    const right = document.createElement("div");
+    right.className = "store-popup-right";
+
+    // 3a. 설명
+    const desc = document.createElement("div");
+    desc.className = "store-popup-description";
+    desc.textContent = item.description;
+    right.appendChild(desc);
+
+    // 3b. 카운터 (- count + ) — max > 1 일 때만 표시
+    //     consumable 처럼 max === 1 이면 영역 자체를 안 그림
+    if (max > 1) {
+        const counter = document.createElement("div");
+        counter.className = "store-popup-counter";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "store-popup-minus";
+        minusBtn.textContent = "−";
+        minusBtn.disabled = count <= 1; // 1 이면 더 못 내려감
+        minusBtn.addEventListener("click", onSubtractCountClick);
+        counter.appendChild(minusBtn);
+
+        const countDisplay = document.createElement("span");
+        countDisplay.className = "store-popup-count";
+        countDisplay.textContent = count;
+        counter.appendChild(countDisplay);
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "store-popup-plus";
+        plusBtn.textContent = "+";
+        plusBtn.disabled = count >= max; // max 면 더 못 올라감
+        plusBtn.addEventListener("click", onAddCountClick);
+        counter.appendChild(plusBtn);
+
+        right.appendChild(counter);
+    }
+
+    // 3c. 버튼 영역 (안 사겠소 | 사겠소)
+    const buttons = document.createElement("div");
+    buttons.className = "store-popup-buttons";
+
+    // 취소 버튼 — 라벨은 mode 따라
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "store-popup-cancel";
+    cancelBtn.textContent = mode === "sell" ? "안 팔겠소" : "안 사겠소";
+    cancelBtn.addEventListener("click", onStoreCancelClick);
+    buttons.appendChild(cancelBtn);
+
+    // 확정 버튼 — 라벨은 mode 따라, max 가 0 이면 disabled
+    // (살 돈 부족 / 인벤 꽉참 / 인벤 0개 같은 케이스 UX 차단.
+    //  onBuyClick/onSellClick 안에서도 한번 더 방어함.)
+    const confirmBtn = document.createElement("button");
+    confirmBtn.className = "store-popup-confirm";
+    confirmBtn.textContent = mode === "sell" ? "팔겠소" : "사겠소";
+    confirmBtn.disabled = max < 1;
+    confirmBtn.addEventListener("click", onStoreConfirmClick);
+    buttons.appendChild(confirmBtn);
+
+    right.appendChild(buttons);
+
+    container.appendChild(right);
+}
+// ═══════════════════════════════════════════════
+// 6. 팝업 클릭 핸들러 (주디작업)
+// ═══════════════════════════════════════════════
+
+/**
+ * '안사기' / '안팔기' 버튼 클릭 시.
+ */
+function onStoreCancelClick() {
+    // 1. closeStorePopup() 호출하면 끝.
+    //    STATE 정리 + DOM 정리 둘 다 closeStorePopup 안에서 처리됨.
+    // 반환값 없음.
+}
+
+/**
+ * 수량 +1 버튼 클릭 시.
+ */
+function onAddCountClick() {
+    // 수량조절기에 + 버튼을 눌렀을때 사용되는 함수
+    // 구매/판매하려는 수치(STATE.storePopup.count)에 +1을 하고, 그때마다 팝업을 다시 그린다(숫자가 바뀌니까)
+    // 수치가 이미 최대값(getStorePopupMax()을 이용)이면 더이상 더하지 않는다
+    //
+    // 1. STATE.storePopup 가 null 이면 그냥 return (방어 — 팝업 안 열려있는데 호출된 케이스)
+    //
+    // 2. 할 수 있는 최대값 이상 넘어가면 안된다고하기 :
+    //    let max = getStorePopupMax();
+    //     getStorePopupMax 함 읽어보고 이용해보아용
+    //
+    // 3. 수치가 max 보다 작을 때만 +=1
+    //    (이미 max 면 아무것도 안 함)
+    //
+    // 4. 숫자 하나 더해질때마다 renderStorePopup() 호출해서 팝업 다시 그리기
+    //
+    // 반환값 없음.
+}
+
+/**
+ * 수량 -1 버튼 클릭 시.
+ */
+function onSubtractCountClick() {
+    // 1. STATE.storePopup 가 null 이면 return (방어)
+    //
+    // 2. STATE.storePopup.count 가 1 보다 클 때만 -=1
+    //    (최소 1 유지. 0 으로 내려가면 안 됨)
+    //
+    // 3. renderStorePopup() 호출해서 팝업 다시 그리기
+    //
+    // 반환값 없음.
+}
+
+// ═══════════════════════════════════════════════
 // 7. NPC + 나가기 버튼 (1단계 stub — 2단계에서 채울 예정)
 // ═══════════════════════════════════════════════
 
@@ -468,12 +717,3 @@ function renderStoreNpc() {
 function renderExitStoreButton() {
     // 1단계엔 HTML 에 정적으로 있고 game.js 에서 핸들러 연결됨 — 비워둠
 }
-
-// ═══════════════════════════════════════════════════════
-// ⬇️ 2단계 LATER — 1단계에서는 안 만듦
-// ═══════════════════════════════════════════════════════
-// onStoreCancelClick()      팝업 닫기 버튼
-// onAddCountClick()         팝업 수량 +1
-// onSubtractCountClick()    팝업 수량 -1
-// renderBuyPopup(itemId)    구매 팝업창
-// renderSellPopup(itemId)   판매 팝업창
