@@ -613,7 +613,7 @@ function renderStorePopup() {
         const minusBtn = document.createElement("button");
         minusBtn.className = "store-popup-minus";
         minusBtn.textContent = "−";
-        minusBtn.disabled = count <= 1; // 1 이면 더 못 내려감
+        minusBtn.disabled = false;
         minusBtn.addEventListener("click", onSubtractCountClick);
         counter.appendChild(minusBtn);
 
@@ -625,7 +625,7 @@ function renderStorePopup() {
         const plusBtn = document.createElement("button");
         plusBtn.className = "store-popup-plus";
         plusBtn.textContent = "+";
-        plusBtn.disabled = count >= max; // max 면 더 못 올라감
+        plusBtn.disabled = false;
         plusBtn.addEventListener("click", onAddCountClick);
         counter.appendChild(plusBtn);
 
@@ -668,6 +668,7 @@ function onStoreCancelClick() {
     // 1. closeStorePopup() 호출하면 끝.
     //    STATE 정리 + DOM 정리 둘 다 closeStorePopup 안에서 처리됨.
     // 반환값 없음.
+    closeStorePopup();
 }
 
 /**
@@ -679,31 +680,48 @@ function onAddCountClick() {
     // 수치가 이미 최대값(getStorePopupMax()을 이용)이면 더이상 더하지 않는다
     //
     // 1. STATE.storePopup 가 null 이면 그냥 return (방어 — 팝업 안 열려있는데 호출된 케이스)
-    //
+    if (STATE.storePopup === null) {
+        return;
+    }
+
     // 2. 할 수 있는 최대값 이상 넘어가면 안된다고하기 :
-    //    let max = getStorePopupMax();
-    //     getStorePopupMax 함 읽어보고 이용해보아용
-    //
+    let max = getStorePopupMax();
+    
     // 3. 수치가 max 보다 작을 때만 +=1
-    //    (이미 max 면 아무것도 안 함)
-    //
+    if (STATE.storePopup.count < max) {
+        STATE.storePopup.count += 1;
+    }
+    // max일때 누르면 다시 1로 리셋
+    else if (STATE.storePopup.count === max) {
+        STATE.storePopup.count = 1;
+    }
     // 4. 숫자 하나 더해질때마다 renderStorePopup() 호출해서 팝업 다시 그리기
-    //
-    // 반환값 없음.
+    renderStorePopup();
 }
 
 /**
  * 수량 -1 버튼 클릭 시.
  */
-function onSubtractCountClick() {
+function onSubtractCountClick(){
     // 1. STATE.storePopup 가 null 이면 return (방어)
-    //
+    if (STATE.storePopup === null) return;
+
     // 2. STATE.storePopup.count 가 1 보다 클 때만 -=1
     //    (최소 1 유지. 0 으로 내려가면 안 됨)
-    //
-    // 3. renderStorePopup() 호출해서 팝업 다시 그리기
-    //
-    // 반환값 없음.
+    if (STATE.storePopup.count > 1) {
+        STATE.storePopup.count -= 1;
+    }
+    // 3. 현재 수량이 1인데 -1을 누르면, 최대 수량
+    else if (STATE.storePopup.count === 1) {
+        let max = getStorePopupMax();
+        
+        // 최대 수량이 0이나 음수면 그냥 1로 유지
+        if (max > 0) {
+            STATE.storePopup.count = max; 
+        }
+    }
+    // 4. renderStorePopup() 호출해서 팝업 다시 그리기
+    renderStorePopup();
 }
 
 // ═══════════════════════════════════════════════
