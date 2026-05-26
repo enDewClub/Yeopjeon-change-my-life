@@ -20,12 +20,16 @@
 
     --primary-select: #72c6a5;
     --primary-select-80: color-mix(in srgb, #b82647 80%, transparent);
+    --primary-select-bright: rgb(81, 226, 168);
 
+    --secondary-select: #9f494c;
     /* Secondary (Orange) - 보조 색상 */
     --secondary-100: #fce6cc;
     --secondary-500: #fb770b;
     --secondary-700: #c2410c;
 
+    --tritniary-select: #f0e8d4;
+    --tritniary-select-50: #e8d5a6;
     /* Neutral (Gray) - 중성 색상 */
     --neutral-0: #ffffff;
     --neutral-50: #f5f6f5;

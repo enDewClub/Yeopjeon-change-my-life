@@ -78,6 +78,8 @@ function setupCharacterForMap(map) {
     $("character-base").src = IMAGE;
     $("character-clothes").src =
         STATE.upgrades.clothes.getCurrentLevelData().image;
+    // $("character-hat").src =
+    //     STATE.upgrades.hats.getCurrentLevelData().image;
 
     // 시작 위치로 이동 + 초기 한 번 렌더
     STATE.character.setPosition(map.characterStart.x, map.characterStart.y);

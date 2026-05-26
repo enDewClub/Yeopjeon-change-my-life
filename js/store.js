@@ -226,6 +226,8 @@ function onBuyClick(itemId, count) {
         renderSellItemList();
         // 성공 메시지
         displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+        // 성공 시 팝업 닫기
+        closeStorePopup();
     } else {
         // 일반 아이템: 인벤토리에 추가
         // 1) 인벤토리에 아이템 1개 추가
@@ -445,6 +447,10 @@ function renderSellItemButton(itemId) {
     const btn = document.createElement("button");
     btn.className = "store-item-button";
 
+    // ─── 아이콘 + 갯수 묶음 (count 가 icon 기준으로 위치 잡도록) ───
+    const iconWrapper = document.createElement("div");
+    iconWrapper.className = "store-item-icon-wrapper";
+
     // 3. <img> element 만들기:
     //    - src = item.icon
     //    - alt = item.displayName
@@ -452,14 +458,18 @@ function renderSellItemButton(itemId) {
     const icon = document.createElement("img");
     icon.src = item.icon;
     icon.alt = item.displayName;
-    btn.appendChild(icon);
+    iconWrapper.appendChild(icon);
 
     // 4. <span> element 만들기 — 인벤토리에서 갯수를 직접 조회해서 표시:
     //    - textContent = "×" + STATE.inventory.getItemCount(itemId)
     //    - 버튼에 appendChild
     const count = document.createElement("span");
+    count.className = "store-item-button-count"; //Thisclass
     count.textContent = STATE.inventory.getItemCount(itemId) + "개";
-    btn.appendChild(count);
+    iconWrapper.appendChild(count);
+
+    btn.appendChild(iconWrapper);
+    // ─────────────────────────────────────────────
 
     // 5. <span> element 만들기:
     //    - textContent = item.sellPrice + "푼"

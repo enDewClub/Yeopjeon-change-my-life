@@ -191,7 +191,7 @@ body {
     width: var(--exit-button-width);
     height: var(--exit-button-height);
     background-color: var(--button-exit-bg);
-    border: 2px solid var(--border-secondary);
+    border: none;
     border-radius: var(--radius-base);
     font-family: var(--font-family);
     font-size: var(--font-size-base);
@@ -203,7 +203,8 @@ body {
 }
 
 .exit-btn:hover {
-    background-color: var(--button-exit-hover);
+    background-color: var(--secondary-select);
+    color: white;
 }
 
 /* 출구 버튼 위치별 클래스 */
@@ -328,7 +329,8 @@ body {
 
 /* 선택된 인벤토리 슬롯 - 굵은 컬러 테두리로 강조 */
 .inventory-slot.selected {
-    outline: 3px solid var(--primary-500);
+    /* outline: 3px solid var(--primary-500); */
+    background-color: var(--primary-select);
     outline-offset: -3px;
 }
 
@@ -380,7 +382,7 @@ body {
 
 /* --- 메시지 영역: 선택된 아이템 표시 (맵과 인벤토리 사이) --- */
 #message-area {
-    height: var(--message-area-height);
+    height: 80px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -409,8 +411,8 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--spacing-6);
-    background-color: var(--neutral-100);
-    border-bottom: 1px solid var(--border-primary);
+    /* background-color: var(--neutral-100); */
+    /* border-bottom: 1px solid var(--border-primary); */
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-medium);
 }
@@ -501,15 +503,15 @@ body {
     flex: 2.2;
     display: flex;
     flex-direction: column;
-    padding: 64px 0px 48px 0px;
-    height: 80%;
+    padding: 96px 0px 32px 0px;
+    height: 90%;
     justify-content: center;
 }
 
 /* 구매/판매 섹션 (각각 위/아래 절반) */
 .store-section {
     flex: 1;
-    padding: var(--spacing-4) 0px;
+    padding: var(--spacing-2) 0px;
     overflow-y: auto;
 }
 
@@ -536,9 +538,9 @@ body {
 .store-item-button {
     width: 80px;
     height: 100px;
-    padding: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-1);
     background-color: var(--neutral-50-80);
-    border: none;
+    border: 2px solid #333;
     border-radius: var(--radius-base);
     cursor: pointer;
     display: flex;
@@ -555,21 +557,45 @@ body {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     font-weight: 600;
 }
+/* 상점 아이템 버튼 — 아이콘 + 갯수 묶음 */
+.store-item-icon-wrapper {
+    position: relative; /* ← 핵심: 자식 count 의 absolute 기준이 됨 */
+    width: 64px;
+    height: 64px;
+}
 
 .store-item-button img {
     width: 64px;
     height: 64px;
     object-fit: contain;
 }
+.store-item-button-count {
+    width: 32px;
+    height: 24px;
+    border-radius: var(--radius-base);
+    border: 1px solid #333;
+    background-color: #d6ecdecf;
+    position: absolute;
+    bottom: 2px;
+    right: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+}
 
 #store-message {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 240px;
     height: var(--message-area-height);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     padding: 0 var(--spacing-4);
-    background-color: var(--neutral-0);
-    border-bottom: 1px solid var(--border-primary);
+    /* background-color: var(--neutral-0); */
+    /* border-bottom: 1px solid var(--border-primary); */
     color: var(--text-primary);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
@@ -590,7 +616,7 @@ body {
 #field-timer {
     position: absolute;
     top: var(--spacing-4);
-    left: 50%;
+    right: 40px;
     transform: translateX(-50%);
     padding: var(--spacing-2) var(--spacing-4);
     background-color: rgba(255, 255, 255, 0.85);
@@ -630,21 +656,24 @@ body {
 /* --- 3x3 밭 그리드 (중앙) --- */
 #field-grid {
     position: absolute;
-    top: 50%;
+    top: 53%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
     gap: var(--spacing-1);
+    /* border: 0.1px solid var(--neutral-10);a */
+    border-radius: var(--radius-sm);
+    background-color: rgba(120, 80, 40, 0.3);
 }
 
 .field-cell {
     width: 100px;
     height: 100px;
-    background-color: rgba(120, 80, 40, 0.5); /* 흙 느낌 */
-    border: 2px solid var(--neutral-900);
-    border-radius: var(--radius-sm);
+    /* background-color: rgba(120, 80, 40, 0.5); 흙 느낌 */
+    /* border: 2px solid var(--neutral-900); */
+    border-radius: var(--radius-lg);
     cursor: pointer;
     transition: background-color 0.15s;
     /* 자식 아이콘을 가운데로 */
@@ -653,8 +682,8 @@ body {
     justify-content: center;
 }
 
-.field-cell:hover {
-    background-color: rgba(120, 80, 40, 0.75);
+#field-grid:hover {
+    background-color: rgba(120, 80, 40, 0.55);
 }
 
 /* 밭 셀 안의 아이콘 (씨앗/작물 이미지) */
@@ -699,7 +728,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     padding: var(--spacing-3) var(--spacing-6);
-    background-color: var(--primary-500);
+    background-color: var(--primary-select);
     color: var(--neutral-900);
     border: none;
     border-radius: var(--radius-base);
@@ -713,7 +742,7 @@ body {
 }
 
 .special-action-btn:hover {
-    background-color: var(--primary-700);
+    background-color: var(--secondary-select);
     color: var(--text-inverse);
 }
 
@@ -742,7 +771,7 @@ body {
    ═══════════════════════════════════════════════ */
 .exit-btn.out-of-range,
 .special-action-btn.out-of-range,
-.field-cell.out-of-range,
+/* .field-cell.out-of-range, */
 #btn-water.out-of-range,
 #btn-harvest.out-of-range {
     opacity: 0.4;
@@ -848,27 +877,36 @@ body {
 .store-popup-counter {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    border: 1px solid #666;
+    justify-content: space-between;
+    /* gap: 16px; */
+    border: 1px solid #4b4b4b;
     border-radius: 999px;
     padding: 4px 14px;
     align-self: center;
+    background-color: var(--tritniary-select);
+    width: 180px;
+    height: 48px;
+    box-shadow: var(--shadow-md);
 }
 
 .store-popup-minus,
 .store-popup-plus {
-    width: 24px;
-    height: 24px;
-    border: 1px solid #666;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #4b4b4b;
     border-radius: 50%;
-    background: transparent;
+    background-color: var(--tritniary-select-50);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    padding-bottom: 2px;
+}
+
+.store-popup-minus:hover,
+.store-popup-plus:hover {
+    background-color: var(--primary-select-bright);
 }
 
 .store-popup-minus:disabled,
@@ -894,15 +932,24 @@ body {
 .store-popup-confirm {
     padding: 8px 20px;
     border: 1.5px solid #333;
-    background: #fff;
+    background: #b3eedf;
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
 }
+.store-popup-cancel {
+    background: #f5f5f5;
+}
 
-.store-popup-cancel:hover,
+.store-popup-cancel:hover {
+    background: var(--secondary-select);
+    font-weight: var(--font-weight-bold);
+    color: white;
+}
+
 .store-popup-confirm:hover:not(:disabled) {
-    background: #f0e8d4;
+    background: var(--primary-select-bright);
+    font-weight: var(--font-weight-bold);
 }
 
 .store-popup-confirm:disabled {
