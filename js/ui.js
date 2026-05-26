@@ -61,11 +61,36 @@ function renderMoney() {
  */
 function renderInventory() {
     const bar = $("inventory-bar");
-    bar.innerHTML = ""; // 기존 슬롯 모두 지우기
+    bar.innerHTML = "";
 
-    STATE.inventory.slotsArray.forEach((slot, index) => {
-        bar.appendChild(createSlotElement(slot, index));
-    });
+    // 두 줄로 나누기: 0~9 = 첫 번째 줄, 10~19 = 두 번째 줄
+    const slotsPerRow = 10;
+    const rowCount = STATE.inventory.slotsArray.length / slotsPerRow;
+
+    for (let row = 0; row < rowCount; row++) {
+        // 프레임 컨테이너 (프레임 이미지 + 행 슬롯들)
+        const rowFrame = document.createElement("div");
+        rowFrame.className = "inventory-row-frame";
+
+        const frameImg = document.createElement("img");
+        frameImg.className = "inventory-row-frame-img";
+        frameImg.src = "img_assets/ui/inventory_frame.png"; // 프레임 PNG 경로
+        frameImg.alt = "";
+        rowFrame.appendChild(frameImg);
+
+        // 슬롯 10개가 담길 그리드
+        const rowEl = document.createElement("div");
+        rowEl.className = "inventory-row";
+
+        for (let i = 0; i < slotsPerRow; i++) {
+            const index = row * slotsPerRow + i;
+            const slot = STATE.inventory.slotsArray[index];
+            rowEl.appendChild(createSlotElement(slot, index));
+        }
+
+        rowFrame.appendChild(rowEl);
+        bar.appendChild(rowFrame);
+    }
 }
 
 /**

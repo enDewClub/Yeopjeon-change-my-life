@@ -30,13 +30,24 @@
              씬 2: 게임 화면 (소지금 + 맵 + 인벤토리)
              ═══════════════════════════════════════════ -->
             <div id="scene-game" class="scene">
-                <!-- 상단: 소지금 표시 -->
-                <div id="money-display">
-                    소지금: <span id="money-amount">100</span>푼
-                </div>
-
+                <!-- <div id="money-display">
+                    
+                </div> -->
                 <!-- 가운데: 맵 영역 (배경 + 출구버튼 + 상호작용요소) -->
                 <div id="map-area">
+                    <!-- 상단: 소지금 표시 -->
+
+                    <div class="money-frame-wrapper">
+                        <img
+                            id="money-frame"
+                            src="img_assets/ui/money_display_ui.png"
+                            alt=""
+                        />
+                        <span class="money-text">
+                            <span id="money-amount">100</span>푼
+                        </span>
+                    </div>
+
                     <!-- 맵 배경 이미지 (JS의 renderMap에서 src 설정) -->
                     <img id="map-bg" src="" alt="" />
 
@@ -69,11 +80,6 @@
 
                 <!-- 하단: 인벤토리 바 (2줄 x 10칸 = 총 20칸) -->
                 <div id="inventory-container">
-                    <img
-                        id="inventory-frame"
-                        src="img_assets/ui/inventory_frame.png"
-                        alt=""
-                    />
                     <div id="inventory-bar"></div>
                 </div>
             </div>
