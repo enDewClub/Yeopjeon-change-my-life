@@ -30,6 +30,7 @@ function renderMap(mapId) {
     //    순서 주의: renderField 가 내부에서 또 비우므로 upgradables 보다 먼저 호출.
     $("map-interactables").innerHTML = "";
     renderField(); // 밭 셀 (밭 맵일 때만 내용 추가, 아니면 no-op)
+    renderMountain(); // 산 식물 (산맵일 때만)
     renderUpgradablesForMap(); // 집 등 (현재 맵에 배치된 것들)
 
     // 4. 캐릭터 (위치 리셋 + 베이스/옷 src 세팅)

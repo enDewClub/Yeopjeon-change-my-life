@@ -294,4 +294,8 @@ function refreshProximityStates() {
     if (water) check(water, FIELD_RADIUS);
     const harvest = $("btn-harvest");
     if (harvest) check(harvest, FIELD_RADIUS);
+
+    document
+        .querySelectorAll(".wild-plant")
+        .forEach((el) => check(el, FIELD_RADIUS));
 }

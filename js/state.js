@@ -24,6 +24,7 @@ const STATE = {
     character: null, // Character 인스턴스 (resetGameState 에서 생성)
     upgrades: {}, // { house: Upgradable, clothes: Upgradable } - resetGameState 에서 채움
     storePopup: null, // 열려있으면 { mode: "buy"|"sell", itemId, count }, 닫혀있으면 null
+    mountain: null,
 };
 
 // ═══════════════════════════════════════════════
@@ -61,4 +62,9 @@ function resetGameState() {
     }
 
     STATE.storePopup = null; // 팝업 닫힌 상태로 시작
+
+    // 새 산 인스턴스 생성. 이전 인스턴스가 있으면 타이머 정리 먼저.
+    // (없으면 첫 게임 시작 — 그냥 새로 만듦)
+    STATE.mountain?.dispose();
+    STATE.mountain = new Mountain();
 }

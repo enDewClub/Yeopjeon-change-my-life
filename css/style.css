@@ -758,3 +758,48 @@ body {
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* ═══════════════════════════════════════════════
+   산맵 - 채집 식물 그리드
+   #map-interactables 안에 6x3 그리드.
+   빈 셀은 보이지 않지만 그리드 슬롯은 유지 (자동 배치 위해).
+   ═══════════════════════════════════════════════ */
+
+#mountain-grid {
+    position: absolute;
+    /* 맵 영역을 거의 가득 채움. 좌우상하 약간 여백. */
+    inset: var(--spacing-8) var(--spacing-12);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--spacing-2);
+    /* 위에 캐릭터/버튼 클릭 가능하게 빈 셀은 클릭 통과시킴 */
+    pointer-events: none;
+}
+
+.mountain-cell {
+    /* 자체로는 보이지 않음. 식물 img 가 들어가면 그것만 보임. */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 내부 식물은 다시 클릭 받게 */
+    pointer-events: auto;
+}
+
+.wild-plant {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    cursor: pointer;
+    /* 사용자 선택/드래그 방지 */
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* 캐릭터가 멀면 다른 상호작용 요소처럼 흐려지고 클릭 차단 — 
+   refreshProximityStates 가 .out-of-range 토글함 */
+.wild-plant.out-of-range {
+    opacity: 0.4;
+    pointer-events: none;
+}

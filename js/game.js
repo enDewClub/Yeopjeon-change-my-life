@@ -127,6 +127,15 @@ window.addEventListener("DOMContentLoaded", () => {
     // #map-interactables 안의 어떤 요소를 눌렀는지 확인 후 적절한 핸들러로 분기
     // ═══════════════════════════════════════════════
     $("map-interactables").addEventListener("click", (event) => {
+        // 산 식물 클릭 → 채집
+        const plantEl = event.target.closest(".wild-plant");
+        if (plantEl) {
+            const x = Number(plantEl.dataset.x);
+            const y = Number(plantEl.dataset.y);
+            onPlantClick(x, y);
+            return;
+        }
+
         // 밭 셀 클릭 → 심기 시도
         if (event.target.closest(".field-cell")) {
             onFieldCellClick();
@@ -143,6 +152,32 @@ window.addEventListener("DOMContentLoaded", () => {
             return;
         }
     });
+
+    /**
+     * 산 식물 클릭 → 채집 시도.
+     * pickPlant 의 tagged 반환값으로 분기:
+     *   ok        → 인벤토리/맵 다시 그리고 성공 메시지
+     *   inventoryFull → 메시지만 표시 (그리드 변화 없음)
+     *   emptyCell / outOfBounds → 조용히 무시 (레이스 컨디션 / 잘못된 클릭)
+     */
+    function onPlantClick(x, y) {
+        const result = STATE.mountain.pickPlant(x, y);
+
+        if (result.ok) {
+            const name = DATA.ITEMS[result.plantId].displayName;
+            renderMountain();
+            renderInventory();
+            $("message-area").textContent = `${name}을(를) 채집했습니다`;
+            return;
+        }
+
+        if (result.reason === "inventoryFull") {
+            $("message-area").textContent = "가방이 가득 찼습니다!";
+            return;
+        }
+
+        // emptyCell, outOfBounds → 조용히 무시
+    }
 
     // 상점의 "나가기" 버튼
     $("btn-leave-store").addEventListener("click", onExitStoreClick);

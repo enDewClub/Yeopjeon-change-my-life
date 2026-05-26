@@ -38,6 +38,7 @@
 function defineItems({
     seeds = {},
     crops = {},
+    wildPlants = {},
     consumables = {},
     folder = "farm",
 }) {
@@ -67,6 +68,19 @@ function defineItems({
             id,
             type: "crop",
             icon: path(id),
+            ...def,
+        };
+    }
+    // ─── 야생 식물(채집식물) 처리 ──────────────────────
+    // 산에서 채집. icon (인벤토리용) + inGroundImage (땅 위 표시용) 두 이미지.
+    // seed/crop 처럼 두 아이템으로 나누지 않는 이유: 정체성은 그대로고
+    // 보여지는 모습만 다르기 때문 (한 아이템 + 두 이미지).
+    for (const [id, def] of Object.entries(wildPlants)) {
+        items[id] = {
+            id,
+            type: "wildPlant",
+            icon: path(id),
+            inGroundImage: path(`${id}_ready`),
             ...def,
         };
     }
@@ -162,10 +176,24 @@ const DATA = {
             "tomato_seed",
             "carrot_seed",
             "sweetPotato_seed",
-            "magicBook",
-            "magicSilk",
             // "honey_tteock",
         ],
+
+        // 산맵 채집 설정
+        // 6 x 3 그리드, 항상 6개 식물 유지 (보이는 것 + 리스폰 대기중).
+        // 리스폰: 채집되면 10초 뒤 빈 칸 중 하나에 랜덤 식물로 새로 나타남.
+        MOUNTAIN: {
+            GRID_WIDTH: 6, // 가로 칸 수 (x: 0..5)
+            GRID_HEIGHT: 3, // 세로 칸 수 (y: 0..2)
+            PLANTS_ON_MAP: 6, // 동시에 맵에 존재하는 총 식물 수
+            RESPAWN_SECONDS: 10, // 채집 후 리스폰까지 시간 (초)
+            PLANT_TYPES_ARRAY: [
+                // 추첨 풀. 중복 허용 (3개가 같은 종류여도 OK).
+                "ssuk",
+                "pyogo",
+                "doraji",
+            ],
+        },
     },
 
     // ═══════════════════════════════════════════════
@@ -199,6 +227,7 @@ const DATA = {
             exits: {
                 right: "home",
                 left: "palace",
+                top: "mountain_enterance",
             },
             specialAction: {
                 label: "상점 들어가기",
@@ -226,7 +255,7 @@ const DATA = {
             },
         },
 
-        // 밭 - 농사 짓는 곳 (Step 1 에서 3x3 그리드 추가 예정)
+        // 밭 - 농사 짓는 곳
         field: {
             displayName: "밭",
             bgImage: "img_assets/bg/field.png",
@@ -234,6 +263,31 @@ const DATA = {
             exits: {
                 top: "home", // 위쪽 → 집터 (밭에서 나가기)
             },
+        },
+
+        // 산 - 야생 식물 채집하는 곳
+        mountain: {
+            displayName: "산",
+            bgImage: "img_assets/bg/mountain.png",
+            exits: {
+                left: "mountain_enterance", // 왼쪽 → 산입구로 돌아가기
+            },
+            // 캐릭터는 왼쪽 끝에서 시작 (출구 근처)
+            characterStart: { x: 0, y: 240 },
+        },
+        mountain_enterance: {
+            displayName: "산입구",
+            bgImage: "img_assets/bg/mountain_enterance.png",
+            exits: {
+                right: "mountain", // 오른쪽 → 산(채집)으로 돌아가기
+                bottom: "village",
+            },
+            // specialAction: {
+            //     label: "호랑이상점 들어가기",
+            //     actionType: "goTigerShop",
+            // },
+            // 맵 가운데
+            characterStart: { x: 440, y: 230 },
         },
     },
 
@@ -305,102 +359,152 @@ const DATA = {
     //   growsInto    : 씨앗 → 자란 작물 ID (씨앗만)
     //   growTime     : 다 자라는 시간(초) (씨앗만)
     // ═══════════════════════════════════════════════
-    ITEMS: defineItems({
-        seeds: {
-            potato_seed: {
-                displayName: "감자 씨앗",
-                description: "감자 씨앗이 담긴 주머니입니다.",
-                buyPrice: 20,
-                growsInto: "potato",
-                growTime: 60,
+    ITEMS: {
+        ...defineItems({
+            seeds: {
+                potato_seed: {
+                    displayName: "감자 씨앗",
+                    description: "감자 씨앗이 담긴 주머니입니다.",
+                    buyPrice: 20,
+                    growsInto: "potato",
+                    growTime: 60,
+                },
+                garlic_seed: {
+                    displayName: "마늘 씨앗",
+                    description: "마늘 씨앗이 담긴 주머니입니다.",
+                    buyPrice: 10,
+                    growsInto: "garlic",
+                    growTime: 30,
+                },
+                tomato_seed: {
+                    displayName: "토마토 씨앗",
+                    description: "토마토 씨앗이 담긴 주머니입니다.",
+                    buyPrice: 15,
+                    growsInto: "tomato",
+                    growTime: 45,
+                },
+                carrot_seed: {
+                    displayName: "당근 씨앗",
+                    description: "당근 씨앗이 담긴 주머니입니다.",
+                    buyPrice: 15,
+                    growsInto: "carrot",
+                    growTime: 45,
+                },
+                sweetPotato_seed: {
+                    displayName: "고구마 씨앗",
+                    description: "고구마 씨앗이 담긴 주머니입니다.",
+                    buyPrice: 20,
+                    growsInto: "sweetPotato",
+                    growTime: 45,
+                },
             },
-            garlic_seed: {
-                displayName: "마늘 씨앗",
-                description: "마늘 씨앗이 담긴 주머니입니다.",
-                buyPrice: 10,
-                growsInto: "garlic",
-                growTime: 30,
+            crops: {
+                potato: {
+                    displayName: "감자",
+                    description:
+                        "다양한 요리와 민간요법에 쓰이는 구황작물입니다. \n식이섬유가 풍부해 포만감이 오래 유지되는 것이 특징입니다. \n감자밭에서 바늘찾지 말고 튼실한 감자 찾으세요.",
+                    sellPrice: 7,
+                },
+                garlic: {
+                    displayName: "마늘",
+                    description:
+                        "곰이 즐겨먹던 바로 그 마늘입니다. \n특유의 냄새와 매운맛이 특징입니다. \n문둥이 콧구멍에 박힌 마늘씨를 파먹지 않게 주의하세요.",
+                    sellPrice: 3,
+                },
+                tomato: {
+                    displayName: "토마토",
+                    description:
+                        "다양한 영양소를 품고 있는 동그란 열매입니다. \n토마토를 식용하는 것이 도입된 것은 오래 지나지 않았습니다. \n사과가 되지 말고 토마토가 되세요.",
+                    sellPrice: 5,
+                },
+                carrot: {
+                    displayName: "당근",
+                    description:
+                        "껍질 채 먹는 것이 좋은 뿌리채소입니다. \n당나라에서 온 뿌리채소라는 뜻으로 당근이라는 이름이 붙었으나 근거는 희박합니다. \n엽전인생이 지루하다면 당근을 한 번 흔들어보세요.",
+                    sellPrice: 5,
+                },
+                sweetPotato: {
+                    displayName: "고구마",
+                    description:
+                        "탄수화물 함량이 많아 주식을 대체할 수 있는 뿌리채소입니다. \n잎자루는 나물로 식용하고, 뿌리는 그대로 쪄서 먹거나 전, 튀김, 엿 등으로 요리합니다. \n이 세상에 고구마 꽃이 피지 않길 바라봅니다.",
+                    sellPrice: 7,
+                },
             },
-            tomato_seed: {
-                displayName: "토마토 씨앗",
-                description: "토마토 씨앗이 담긴 주머니입니다.",
-                buyPrice: 15,
-                growsInto: "tomato",
-                growTime: 45,
+            consumables: {
+                magic_book_2: {
+                    displayName: "신비로운 책",
+                    description:
+                        "알 수 없는 신비로운 힘에 휩싸여 있는 책입니다. \n이 책을 구매하면 집이 보다 살기 좋아질 것 같습니다.",
+                    buyPrice: 200,
+                    consumedAt: "purchase",
+                    effect: { kind: "upgrade", targetId: "house", toLevel: 2 },
+                },
+                // magic_book_3: {
+                //     displayName: "비법서",
+                //     description: "집을 양옥으로 만들어준다",
+                //     buyPrice: 500,
+                //     consume네dAt: "purchase",
+                //     effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
+                // },
+                magic_silk_2: {
+                    displayName: "신비로운 비단",
+                    description:
+                        "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
+                    buyPrice: 150,
+                    consumedAt: "purchase",
+                    effect: {
+                        kind: "upgrade",
+                        targetId: "clothes",
+                        toLevel: 2,
+                    },
+                },
+                // magic_silk_3: {
+                //     displayName: "신비한 비단",
+                //     description: "비단옷으로 갈아입혀준다",
+                //     buyPrice: 400,
+                //     consumedAt: "purchase",
+                //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
+                // },
             },
-            carrot_seed: {
-                displayName: "당근 씨앗",
-                description: "당근 씨앗이 담긴 주머니입니다.",
-                buyPrice: 15,
-                growsInto: "carrot",
-                growTime: 45,
+        }),
+        // 산 채집 아이템: img_assets/items/mountain/
+        // 주디TODO: 식물리스트 업데이트
+        ...defineItems({
+            wildPlants: {
+                ssuk: {
+                    displayName: "쑥",
+                    description: "산에서 캔 쑥",
+                    sellPrice: 5,
+                },
+                // wild_fern: {
+                //     displayName: "고사리",
+                //     description: "산에서 캔 고사리",
+                //     sellPrice: 5,
+                // },
+                pyogo: {
+                    displayName: "표고버섯",
+                    description: "산에서 캔 버섯",
+                    sellPrice: 5,
+                },
+                doraji: {
+                    displayName: "도라지",
+                    description: "산에서 캔 도라지",
+                    sellPrice: 5,
+                },
+                // wild_root: {
+                //     displayName: "도라지",
+                //     description: "산에서 캔 도라지",
+                //     sellPrice: 5,
+                // },
+                // wild_berry: {
+                //     displayName: "산딸기",
+                //     description: "산에서 캔 산딸기",
+                //     sellPrice: 5,
+                // },
             },
-            sweetPotato_seed: {
-                displayName: "고구마 씨앗",
-                description: "고구마 씨앗이 담긴 주머니입니다.",
-                buyPrice: 20,
-                growsInto: "sweetPotato",
-                growTime: 45,
-            },
-        },
-        crops: {
-            potato: {
-                displayName: "감자",
-                description: "다양한 요리와 민간요법에 쓰이는 구황작물입니다. \n식이섬유가 풍부해 포만감이 오래 유지되는 것이 특징입니다. \n감자밭에서 바늘찾지 말고 튼실한 감자 찾으세요.",
-                sellPrice: 7,
-            },
-            garlic: {
-                displayName: "마늘",
-                description: "곰이 즐겨먹던 바로 그 마늘입니다. \n특유의 냄새와 매운맛이 특징입니다. \n문둥이 콧구멍에 박힌 마늘씨를 파먹지 않게 주의하세요.",
-                sellPrice: 3,
-            },
-            tomato: {
-                displayName: "토마토",
-                description: "다양한 영양소를 품고 있는 동그란 열매입니다. \n토마토를 식용하는 것이 도입된 것은 오래 지나지 않았습니다. \n사과가 되지 말고 토마토가 되세요.",
-                sellPrice: 5,
-            },
-            carrot: {
-                displayName: "당근",
-                description: "껍질 채 먹는 것이 좋은 뿌리채소입니다. \n당나라에서 온 뿌리채소라는 뜻으로 당근이라는 이름이 붙었으나 근거는 희박합니다. \n엽전인생이 지루하다면 당근을 한 번 흔들어보세요.",
-                sellPrice: 5,
-            },
-            sweetPotato: {
-                displayName: "고구마",
-                description: "탄수화물 함량이 많아 주식을 대체할 수 있는 뿌리채소입니다. \n잎자루는 나물로 식용하고, 뿌리는 그대로 쪄서 먹거나 전, 튀김, 엿 등으로 요리합니다. \n이 세상에 고구마 꽃이 피지 않길 바라봅니다.",
-                sellPrice: 7,
-            },
-        },
-        consumables: {
-            magicBook: {
-                displayName: "신비로운 책",
-                description: "알 수 없는 신비로운 힘에 휩싸여 있는 책입니다. \n이 책을 구매하면 집이 보다 살기 좋아질 것 같습니다.",
-                buyPrice: 200,
-                consumedAt: "purchase",
-                effect: { kind: "upgrade", targetId: "house", toLevel: 2 },
-            },
-            // magic_book_3: {
-            //     displayName: "비법서",
-            //     description: "집을 양옥으로 만들어준다",
-            //     buyPrice: 500,
-            //     consumedAt: "purchase",
-            //     effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
-            // },
-            magicSilk: {
-                 displayName: "신비로운 비단",
-                 description: "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
-                 buyPrice: 150,
-                 consumedAt: "purchase",
-                 effect: { kind: "upgrade", targetId: "clothes", toLevel: 2 },
-            },
-            // magic_silk_3: {
-            //     displayName: "신비한 비단",
-            //     description: "비단옷으로 갈아입혀준다",
-            //     buyPrice: 400,
-            //     consumedAt: "purchase",
-            //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
-            // },
-        },
-    }),
+            folder: "gathering",
+        }),
+    },
 };
 
 // DATA.ITEMS = {
