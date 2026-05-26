@@ -121,10 +121,19 @@ body {
     user-select: none;
     z-index: 1;
 }
+#money-frame-store {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
 
 /* 텍스트 — 프레임 위로 올라오게 */
 .money-text {
-    position: relative;
+    /* position: relative; */
     z-index: 2;
 }
 #money-amount {
@@ -389,6 +398,7 @@ body {
 
 #scene-store {
     background-color: var(--bg-frame);
+    position: relative;
 }
 
 /* --- 상단 바: 소지금 + 나가기 --- */
@@ -411,7 +421,27 @@ body {
     margin: 0 var(--spacing-1);
 }
 
+/* 배경 두루마리 — 우측에 고정, 모든 콘텐츠 뒤로 깔림 */
+.store-background-scroll {
+    position: absolute;
+    top: 100px;
+    right: -5px; /* 우측 정렬 */
+    height: 100%; /*씬 전체 높이 */
+    z-index: 0; /* 모든 콘텐츠 뒤로 */
+    pointer-events: none; /* 클릭 통과 — 위 요소들이 가려지지 않게 */
+    user-select: none;
+}
+
+.store-background-scroll #menu-store {
+    height: 80%;
+    width: 740px; /* 이미지 비율 유지 */
+    display: block;
+}
+
 #btn-leave-store {
+    position: absolute;
+    bottom: var(--spacing-4);
+    right: var(--spacing-4);
     padding: var(--spacing-2) var(--spacing-4);
     background-color: var(--neutral-0);
     border: 1px solid var(--border-secondary);
@@ -419,6 +449,7 @@ body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     cursor: pointer;
+    z-index: 100;
 }
 
 #btn-leave-store:hover {
@@ -431,29 +462,59 @@ body {
     display: flex;
     flex-direction: row;
     overflow: hidden;
+    z-index: 100;
 }
 
 #store-npc-area {
     flex: 1;
-    background-color: var(--neutral-50);
-    border-right: 1px solid var(--border-primary);
+    /* background-color: var(--neutral-50); */
+    /* border-right: 1px solid var(--border-primary); */
+    /* ─── 새로 추가: 말풍선 위, NPC 아래로 세로 정렬 ─── */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 가로 가운데 */
+    justify-content: center; /* 세로 가운데 */
+    gap: 0px; /* 말풍선과 NPC 사이 간격 */
+    padding: var(--spacing-6) var(--spacing-5);
+    padding-left: 0px;
+}
+
+/* 말풍선 — NPC 바로 위 */
+.store-npc-speech {
+    max-width: 90%;
+    /* height: 50%; */
+    user-select: none;
+    pointer-events: none;
+}
+
+/* NPC 캐릭터 이미지 */
+.store-npc-image {
+    max-width: 100%;
+    /* max-height: 60%; */
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }
 
 #store-content {
-    flex: 1;
+    flex: 2.2;
     display: flex;
     flex-direction: column;
+    padding: 64px 0px 48px 0px;
+    height: 80%;
+    justify-content: center;
 }
 
 /* 구매/판매 섹션 (각각 위/아래 절반) */
 .store-section {
     flex: 1;
-    padding: var(--spacing-4);
+    padding: var(--spacing-4) 0px;
     overflow-y: auto;
 }
 
 .store-section + .store-section {
-    border-top: 1px solid var(--border-primary);
+    /* border-top: 1px solid var(--border-primary); */
 }
 
 .store-section h3 {
@@ -476,8 +537,8 @@ body {
     width: 80px;
     height: 100px;
     padding: var(--spacing-2);
-    background-color: var(--neutral-0);
-    border: 1px solid var(--border-primary);
+    background-color: var(--neutral-50-80);
+    border: none;
     border-radius: var(--radius-base);
     cursor: pointer;
     display: flex;
@@ -489,13 +550,15 @@ body {
 }
 
 .store-item-button:hover {
-    background-color: var(--primary-50);
-    border-color: var(--primary-500);
+    background-color: var(--primary-select);
+    /* border-color: var(--primary-500); */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    font-weight: 600;
 }
 
 .store-item-button img {
-    width: 40px;
-    height: 40px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
 }
 
@@ -511,6 +574,14 @@ body {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
 }
+/* 
+#store-top-bar,
+#store-message,
+#store-body,
+#btn-leave-store {
+    position: relative;
+    z-index: 1;
+} */
 /* ═══════════════════════════════════════════════
    밭 맵 UI (#map-interactables 안에 동적 생성됨)
    ═══════════════════════════════════════════════ */
@@ -726,7 +797,7 @@ body {
     padding: 24px;
     display: flex;
     gap: 24px;
-    z-index: 100;
+    z-index: 200;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 

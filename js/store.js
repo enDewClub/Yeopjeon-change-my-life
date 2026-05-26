@@ -357,8 +357,7 @@ function onSellClick(itemId, sellCount) {
 
 function renderStore() {
     renderMoney();
-    // renderStoreNpc();
-    renderExitStoreButton();
+    renderStoreNpc();
     renderBuyItemList();
     renderSellItemList();
     // TODO 미래: NPC 영역 렌더 (renderStoreNpc) — Stage 2 에서 추가
@@ -390,9 +389,10 @@ function renderBuyItemButton(itemId) {
     // 4. <span> element 만들기:
     //    - textContent = item.displayName
     //    - 버튼에 appendChild
-    const name = document.createElement("span");
-    name.textContent = item.displayName;
-    btn.appendChild(name);
+    // const name = document.createElement("span");
+    // name.textContent = item.displayName;
+    // btn.appendChild(name);
+    //  이름 없었던것같아서 지움
 
     // 5. <span> element 만들기:
     //    - textContent = item.buyPrice + "푼"
@@ -458,7 +458,7 @@ function renderSellItemButton(itemId) {
     //    - textContent = "×" + STATE.inventory.getItemCount(itemId)
     //    - 버튼에 appendChild
     const count = document.createElement("span");
-    count.textContent = "×" + STATE.inventory.getItemCount(itemId);
+    count.textContent = STATE.inventory.getItemCount(itemId) + "개";
     btn.appendChild(count);
 
     // 5. <span> element 만들기:
@@ -729,10 +729,20 @@ function onSubtractCountClick() {
 // ═══════════════════════════════════════════════
 
 function renderStoreNpc() {
-    // 2단계에서 NPC 캐릭터/말풍선 추가 예정
-    store - npc - area;
-}
+    const container = $("store-npc-area");
+    container.innerHTML = ""; // 매번 새로 그림
 
-function renderExitStoreButton() {
-    // 1단계엔 HTML 에 정적으로 있고 game.js 에서 핸들러 연결됨 — 비워둠
+    // 말풍선 (위)
+    const speechBubble = document.createElement("img");
+    speechBubble.className = "store-npc-speech";
+    speechBubble.src = "img_assets/ui/shop_speechbubble_ui.png"; // 경로 조정
+    speechBubble.alt = "";
+    container.appendChild(speechBubble);
+
+    // NPC 이미지 (아래)
+    const npc = document.createElement("img");
+    npc.className = "store-npc-image";
+    npc.src = "img_assets/characters/shop_character_v1_shade.png"; // 경로 조정
+    npc.alt = "상점 주인";
+    container.appendChild(npc);
 }

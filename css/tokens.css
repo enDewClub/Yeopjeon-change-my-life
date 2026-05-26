@@ -18,6 +18,9 @@
     --primary-700: #72aa02;
     --primary-900: #395501;
 
+    --primary-select: #72c6a5;
+    --primary-select-80: color-mix(in srgb, #b82647 80%, transparent);
+
     /* Secondary (Orange) - 보조 색상 */
     --secondary-100: #fce6cc;
     --secondary-500: #fb770b;
@@ -31,6 +34,8 @@
     --neutral-500: #9fa29a;
     --neutral-700: #5f615c;
     --neutral-900: #20201f;
+
+    --neutral-50-80: color-mix(in srgb, var(--neutral-50) 80%, transparent);
 
     /* ═══ 2. 의미 색상 (Semantic Colors) ═══ */
     /* 용도별로 의미를 부여한 색상. 컴포넌트에서는 이걸 쓴다. */

@@ -99,13 +99,27 @@
                 씬 4: 상점 화면
                 ═══════════════════════════════════════════ -->
             <div id="scene-store" class="scene">
-                <!-- 상단: 소지금 + 나가기 버튼 -->
+                <!-- 배경 두루마리 — 가장 뒤에, 우측에 위치 -->
+                <div class="store-background-scroll">
+                    <img
+                        src="img_assets/ui/shop_menu_ui.png"
+                        alt=""
+                        id="menu-store"
+                    />
+                </div>
+
+                <!-- 상단: 소지금 (프레임) -->
                 <div id="store-top-bar">
-                    <span
-                        >소지금:
-                        <span id="store-money-amount">100</span>푼</span
-                    >
-                    <button id="btn-leave-store">상점 나가기</button>
+                    <div class="money-frame-wrapper">
+                        <img
+                            src="img_assets/ui/money_display_ui.png"
+                            alt=""
+                            id="money-frame-store"
+                        />
+                        <span class="money-text">
+                            소지금: <span id="store-money-amount">100</span>푼
+                        </span>
+                    </div>
                 </div>
 
                 <!-- 상점 상태 메시지 영역 -->
@@ -129,6 +143,8 @@
                         </section>
                     </div>
                 </div>
+                <!-- 나가기버튼 -->
+                <button id="btn-leave-store">상점 나가기</button>
             </div>
         </div>
         <!-- /game-container -->
