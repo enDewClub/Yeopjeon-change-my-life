@@ -157,6 +157,22 @@ class Mountain {
         // }
         // if (empties.length === 0) return null;
         // return empties[Math.floor(Math.random() * empties.length)];
+
+        let randomEmptyCell = null ;
+        let isEmptyCell = false; 
+
+        while(isEmptyCell===false){
+            // 행/열 좌표에서 랜덤으로 하나 뽑기
+            let randomX = Math.floor(Math.random() * 6); 
+            let randomY = Math.floor(Math.random() * 3);
+
+            //랜덤으로 뽑은 X,Y의 그리드 자리가 비어있다면
+            if(this.grid[randomY][randomX]===null){
+                randomEmptyCell =  { x: randomX, y: randomY };
+                isEmptyCell = true ;
+            }
+        }
+        return randomEmptyCell;
     }
 
     /**
@@ -165,7 +181,9 @@ class Mountain {
      */
     getRandomPlantId() {
         const typesArray = DATA.CONFIG.MOUNTAIN.PLANT_TYPES_ARRAY;
+        let randomIndex = Math.floor(Math.random()*typesArray.length);
 
+        return typesArray[randomIndex];
         // return string: 랜덤으로 골라진 식물 이름 "doraji"
         // FUTURE: 희귀도 가중치 도입 시 [{id, weight}] 로 바꾸고 가중 추첨.
     }
