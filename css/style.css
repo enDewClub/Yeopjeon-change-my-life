@@ -683,7 +683,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     gap: 16px;
-    min-width: 240px;
+    width: 400px;
 }
 
 .store-popup-description {
