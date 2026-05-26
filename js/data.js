@@ -138,9 +138,9 @@ const DATA = {
         STARTING_MAP: "home", // 게임 시작 시 진입할 맵
         // 시작 시 인벤토리에 넣어줄 아이템들 (테스트 + Step 1 시작 자원)
         STARTING_INVENTORY: [
-            { itemId: "potato_seed", count: 3 },
-            { itemId: "garlic_seed", count: 2 },
-            { itemId: "tomato_seed", count: 1 },
+            // { itemId: "potato_seed", count: 3 },
+            // { itemId: "garlic_seed", count: 2 },
+            // { itemId: "tomato_seed", count: 1 },
         ],
         // 밭 설정값
         FIELD: {
@@ -195,7 +195,7 @@ const DATA = {
                 "dalrae",
                 "duduck",
                 "dureup",
-                "gosari"
+                "gosari",
             ],
         },
     },
@@ -254,7 +254,10 @@ const DATA = {
                 // 입궁 조건. 여러 조건은 모두 만족해야 함 (AND).
                 // 새 조건 추가 = 객체 하나 더 푸시 — 다른 코드 수정 없음.
                 // TODO Stage 2: 옷 조건 추가 시 { upgradableId: "clothes", minLevel: 3 } 한 줄 추가
-                requires: [{ upgradableId: "house", minLevel: 2 }],
+                requires: [
+                    { upgradableId: "house", minLevel: 2 },
+                    { upgradableId: "clothes", minLevel: 1 },
+                ],
                 lockedLabel: "입궁 자격 부족",
             },
         },
@@ -333,8 +336,8 @@ const DATA = {
             renderLocation: { on: "character" },
             startLevel: 1,
             levels: [
-                { level: 1, displayName: "누더기" },
-                { level: 2, displayName: "무명옷" },
+                { level: 1, displayName: "천민옷" },
+                { level: 2, displayName: "평민옷" },
                 { level: 3, displayName: "비단옷" },
             ],
         },
@@ -370,6 +373,7 @@ const DATA = {
                     displayName: "감자 씨앗",
                     description: "감자 씨앗이 담긴 주머니입니다.",
                     buyPrice: 20,
+                    sellPrice: 10,
                     growsInto: "potato",
                     growTime: 60,
                 },
@@ -377,6 +381,7 @@ const DATA = {
                     displayName: "마늘 씨앗",
                     description: "마늘 씨앗이 담긴 주머니입니다.",
                     buyPrice: 10,
+                    sellPrice: 5,
                     growsInto: "garlic",
                     growTime: 30,
                 },
@@ -384,6 +389,7 @@ const DATA = {
                     displayName: "토마토 씨앗",
                     description: "토마토 씨앗이 담긴 주머니입니다.",
                     buyPrice: 15,
+                    sellPrice: 7,
                     growsInto: "tomato",
                     growTime: 45,
                 },
@@ -391,6 +397,7 @@ const DATA = {
                     displayName: "당근 씨앗",
                     description: "당근 씨앗이 담긴 주머니입니다.",
                     buyPrice: 15,
+                    sellPrice: 7,
                     growsInto: "carrot",
                     growTime: 45,
                 },
@@ -398,6 +405,7 @@ const DATA = {
                     displayName: "고구마 씨앗",
                     description: "고구마 씨앗이 담긴 주머니입니다.",
                     buyPrice: 20,
+                    sellPrice: 10,
                     growsInto: "sweetPotato",
                     growTime: 45,
                 },
@@ -439,22 +447,23 @@ const DATA = {
                     displayName: "신비로운 책",
                     description:
                         "알 수 없는 신비로운 힘에 휩싸여 있는 책입니다. \n이 책을 구매하면 집이 보다 살기 좋아질 것 같습니다.",
-                    buyPrice: 200,
+                    buyPrice: 1000,
                     consumedAt: "purchase",
                     effect: { kind: "upgrade", targetId: "house", toLevel: 2 },
                 },
-                // magic_book_3: {
-                //     displayName: "비법서",
-                //     description: "집을 양옥으로 만들어준다",
-                //     buyPrice: 500,
-                //     consume네dAt: "purchase",
-                //     effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
-                // },
+                magic_book_3: {
+                    displayName: "신비로운 책 2",
+                    description:
+                        "알 수 없는 신비로운 힘에 휩싸여 있는 책입니다. \n이 책을 구매하면 집이 보다 살기 좋아질 것 같습니다.",
+                    buyPrice: 1000,
+                    consumedAt: "purchase",
+                    effect: { kind: "upgrade", targetId: "house", toLevel: 3 },
+                },
                 magic_silk_2: {
                     displayName: "신비로운 비단",
                     description:
                         "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
-                    buyPrice: 150,
+                    buyPrice: 1200,
                     consumedAt: "purchase",
                     effect: {
                         kind: "upgrade",
@@ -462,13 +471,18 @@ const DATA = {
                         toLevel: 2,
                     },
                 },
-                // magic_silk_3: {
-                //     displayName: "신비한 비단",
-                //     description: "비단옷으로 갈아입혀준다",
-                //     buyPrice: 400,
-                //     consumedAt: "purchase",
-                //     effect: { kind: "upgrade", targetId: "clothes", toLevel: 3 },
-                // },
+                magic_silk_3: {
+                    displayName: "신비한 비단 2",
+                    description:
+                        "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
+                    buyPrice: 1200,
+                    consumedAt: "purchase",
+                    effect: {
+                        kind: "upgrade",
+                        targetId: "clothes",
+                        toLevel: 3,
+                    },
+                },
             },
         }),
         // 산 채집 아이템: img_assets/items/mountain/
@@ -477,38 +491,45 @@ const DATA = {
             wildPlants: {
                 ssuk: {
                     displayName: "쑥",
-                    description: "건국신화에 나오는 바로 그 쑥입니다. 먹으면 '쑥쑥' 자라는 쑥… \n쑥은 성질이 따듯해 냉증 치료에 효과적이라고 합니다. \n쑥대도 삼밭에 나면 곧아진다고 하니 매일 엽전인생 플레이 하는 것을 잊지마세요.",
+                    description:
+                        "건국신화에 나오는 바로 그 쑥입니다. 먹으면 '쑥쑥' 자라는 쑥… \n쑥은 성질이 따듯해 냉증 치료에 효과적이라고 합니다. \n쑥대도 삼밭에 나면 곧아진다고 하니 매일 엽전인생 플레이 하는 것을 잊지마세요.",
                     sellPrice: 1,
                 },
                 gosari: {
-                     displayName: "고사리",
-                     description: "다양한 민요에 등장하는 고사리는 삶아서 말려 먹으면 약이 되고, 생으로 먹으면 독이 됩니다. \n보통 새순이 올라와 어린 잎이 자라기 전에 수확해서 먹습니다. \n시기를 놓치지 않기 위해서 2~3일에 한 번씩 수확을 해야 하니 \n고사리도 꺾을 때 꺾는다는 속담이 생긴 듯 합니다. ",
-                     sellPrice: 1,
+                    displayName: "고사리",
+                    description:
+                        "다양한 민요에 등장하는 고사리는 삶아서 말려 먹으면 약이 되고, 생으로 먹으면 독이 됩니다. \n보통 새순이 올라와 어린 잎이 자라기 전에 수확해서 먹습니다. \n시기를 놓치지 않기 위해서 2~3일에 한 번씩 수확을 해야 하니 \n고사리도 꺾을 때 꺾는다는 속담이 생긴 듯 합니다. ",
+                    sellPrice: 1,
                 },
                 pyogo: {
                     displayName: "표고버섯",
-                    description: "생명의 비약이라고도 불리는 표고버섯입니다. \n향과 맛, 효능까지 일품이어서 올바르게 섭취하면 건강에 많은 도움을 줍니다. 특유의 감칠맛과 풍부한 영양소로 인해 산에서 나는 고기라고도 불립니다.",
+                    description:
+                        "생명의 비약이라고도 불리는 표고버섯입니다. \n향과 맛, 효능까지 일품이어서 올바르게 섭취하면 건강에 많은 도움을 줍니다. 특유의 감칠맛과 풍부한 영양소로 인해 산에서 나는 고기라고도 불립니다.",
                     sellPrice: 2,
                 },
                 doraji: {
                     displayName: "도라지",
-                    description: "산삼처럼 생겼으나 산삼이 아닌 도라지입니다. \n맛이 맵고 온화하며 독이 있다는 문헌 기록이 있습니다. \n약재로도 쓰이며 오래 묵은 도라지는 산삼보다 좋다는 말이 있을 정도로 몸에 좋은 식물이라고 하네요.",
+                    description:
+                        "산삼처럼 생겼으나 산삼이 아닌 도라지입니다. \n맛이 맵고 온화하며 독이 있다는 문헌 기록이 있습니다. \n약재로도 쓰이며 오래 묵은 도라지는 산삼보다 좋다는 말이 있을 정도로 몸에 좋은 식물이라고 하네요.",
                     sellPrice: 2,
                 },
                 duduck: {
-                     displayName: "더덕",
-                     description: "특유의 향과 쌉싸름하면서 단맛이 나는 덩굴식물입니다. \n뿌리가 도라지나 인삼과 비슷한 게 특징이며, 어릴땐 먹기 싫었지만 갈수록 그 맛에 중독되었어요. 맵게 양념한게 맛있더라고요. \n아삭하고.. 엽전 크기 이상으로 통통하고 곧게 뻗은 것을 고르세요 ",
-                     sellPrice: 2,
+                    displayName: "더덕",
+                    description:
+                        "특유의 향과 쌉싸름하면서 단맛이 나는 덩굴식물입니다. \n뿌리가 도라지나 인삼과 비슷한 게 특징이며, 어릴땐 먹기 싫었지만 갈수록 그 맛에 중독되었어요. 맵게 양념한게 맛있더라고요. \n아삭하고.. 엽전 크기 이상으로 통통하고 곧게 뻗은 것을 고르세요 ",
+                    sellPrice: 2,
                 },
                 dureup: {
-                     displayName: "두릅",
-                     description: "두릅은 두릅나무의 어린 순을 가리키는 말입니다. \n봄 두릅은 금이요 가을 두릅은 은이다 라는 말이 있을 정도로 \n봄철에 나는 두릅의 영양소와 향이 뛰어납니다. \n세릅 네릅 아닌 두릅입니다…",
-                     sellPrice: 2,
+                    displayName: "두릅",
+                    description:
+                        "두릅은 두릅나무의 어린 순을 가리키는 말입니다. \n봄 두릅은 금이요 가을 두릅은 은이다 라는 말이 있을 정도로 \n봄철에 나는 두릅의 영양소와 향이 뛰어납니다. \n세릅 네릅 아닌 두릅입니다…",
+                    sellPrice: 2,
                 },
                 dalrae: {
-                     displayName: "달래",
-                     description: "냉이와 함께 봄에 나는 나물로, 맛이 매콤하고 향긋합니다. \n달래는 달랑달랑 매달린 동그란 모양의 알뿌리에서 유래된 말이며, \n특유의 매운맛과 따듯한 성질 때문에 작은 마늘이라고도 불립니다.",
-                     sellPrice: 1,
+                    displayName: "달래",
+                    description:
+                        "냉이와 함께 봄에 나는 나물로, 맛이 매콤하고 향긋합니다. \n달래는 달랑달랑 매달린 동그란 모양의 알뿌리에서 유래된 말이며, \n특유의 매운맛과 따듯한 성질 때문에 작은 마늘이라고도 불립니다.",
+                    sellPrice: 1,
                 },
             },
             folder: "gathering",

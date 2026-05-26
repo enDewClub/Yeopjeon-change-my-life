@@ -78,6 +78,8 @@ function setupCharacterForMap(map) {
     $("character-base").src = IMAGE;
     $("character-clothes").src =
         STATE.upgrades.clothes.getCurrentLevelData().image;
+    // $("character-hat").src =
+    //     STATE.upgrades.hats.getCurrentLevelData().image;
 
     // 시작 위치로 이동 + 초기 한 번 렌더
     STATE.character.setPosition(map.characterStart.x, map.characterStart.y);
@@ -171,6 +173,7 @@ function isSpecialActionUnlocked(specialAction) {
 function handleSpecialAction(actionType) {
     switch (actionType) {
         case "goEnding":
+            playSfx("welcome"); // ← 추가. 실제 성공했을 때만 울림.
             switchScene("ending");
             break;
         case "goStore":

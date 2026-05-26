@@ -31,9 +31,9 @@ body {
         var(--money-bar-height) + var(--canvas-height) +
             var(--inventory-bar-height) + var(--message-area-height)
     );
-    background-color: var(--bg-primary);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    /* background-color: var(--bg-primary); */
+    /* border-radius: var(--radius-lg); */
+    /* box-shadow: var(--shadow-lg); */
     overflow: hidden;
     position: relative;
 }
@@ -82,12 +82,13 @@ body {
    ═══════════════════════════════════════════════ */
 
 /* --- 상단: 소지금 바 --- */
+/* --- 상단: 소지금 바 --- */
 #money-display {
     height: var(--money-bar-height);
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-end; /* 프레임을 오른쪽에. 가운데로 바꾸려면 center */
     padding: 0 var(--spacing-6);
     background-color: var(--neutral-100);
     border-bottom: 1px solid var(--border-primary);
@@ -95,6 +96,46 @@ body {
     font-weight: var(--font-weight-medium);
 }
 
+/* 프레임 + 텍스트 감싸는 래퍼 — 텍스트 폭에 딱 맞게 줄어듦 */
+.money-frame-wrapper {
+    /* position: relative; 프레임 이미지의 absolute 기준 */
+    position: absolute; /* ← absolute 로 변경 */
+    top: var(--spacing-4); /* 맵 상단에서 16px */
+    left: var(--spacing-4); /* 맵 우측에서 16px */
+    z-index: 10; /* 캐릭터/버튼 위로 */
+    padding: 12px 12px 16px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    width: 150px;
+}
+
+/* 프레임 PNG — 텍스트 영역 전체에 깔리고 클릭은 통과 */
+#money-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
+#money-frame-store {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
+
+/* 텍스트 — 프레임 위로 올라오게 */
+.money-text {
+    /* position: relative; */
+    z-index: 2;
+}
 #money-amount {
     color: var(--secondary-700);
     font-weight: var(--font-weight-bold);
@@ -150,7 +191,7 @@ body {
     width: var(--exit-button-width);
     height: var(--exit-button-height);
     background-color: var(--button-exit-bg);
-    border: 2px solid var(--border-secondary);
+    border: none;
     border-radius: var(--radius-base);
     font-family: var(--font-family);
     font-size: var(--font-size-base);
@@ -162,7 +203,8 @@ body {
 }
 
 .exit-btn:hover {
-    background-color: var(--button-exit-hover);
+    background-color: var(--secondary-select);
+    color: white;
 }
 
 /* 출구 버튼 위치별 클래스 */
@@ -191,18 +233,65 @@ body {
 }
 
 /* --- 하단: 인벤토리 바 (2줄 x 10칸) --- */
+
+/* --- 인벤토리 컨테이너: 프레임 이미지 + 인벤토리 바 겹치기 --- */
+#inventory-container {
+    height: var(--inventory-bar-height);
+    /* width: 640px; */
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* 프레임 이미지 - 인벤토리 위에 겹쳐서 장식. 클릭은 통과시킴 */
+#inventory-frame {
+    position: absolute;
+    inset: 0;
+    width: 640px;
+    height: 50%;
+    pointer-events: none; /* ← 핵심: 슬롯 클릭이 차단되지 않도록 */
+    user-select: none;
+    z-index: 2;
+}
+/* --- 하단: 인벤토리 영역 (2줄, 각 줄마다 프레임) --- */
 #inventory-bar {
     height: var(--inventory-bar-height);
     flex-shrink: 0;
+    /* background-color: var(--neutral-100); */
+    /* border-top: 1px solid var(--border-primary); */
     padding: var(--inventory-padding);
-    background-color: var(--neutral-100);
-    border-top: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* ← 핵심: 각 행을 가로 중앙 정렬 */
+    justify-content: center;
+    gap: 0;
+}
+
+/* 한 줄을 감싸는 프레임 컨테이너 — 가로폭은 내용물(슬롯 10개) 만큼 */
+.inventory-row-frame {
+    position: relative; /* 자식 프레임 이미지의 absolute 기준 */
+    /* padding: var(--inventory-frame-padding); 프레임 두께만큼 안쪽 여백 */
+    display: inline-block; /* 슬롯 폭에 딱 맞춰 줄어듦 → 가운데 정렬됨 */
+}
+
+/* 프레임 PNG — 행 전체에 깔리고 클릭은 통과 */
+.inventory-row-frame-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
+}
+
+/* 슬롯 10개가 가로로 늘어선 그리드 — 프레임 안쪽에 위치 */
+.inventory-row {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(10, var(--inventory-slot-size));
-    grid-template-rows: repeat(2, var(--inventory-slot-size));
-    gap: var(--inventory-slot-gap);
-    justify-content: center;
-    align-content: center;
+    gap: 0;
+    padding: 8px;
 }
 
 /* 인벤토리 칸 1개 - 아이콘과 갯수를 담는 박스 */
@@ -210,8 +299,9 @@ body {
     width: var(--inventory-slot-size);
     height: var(--inventory-slot-size);
     background-color: var(--neutral-0);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-sm);
+    padding: var(--inventory-padding);
+    /* border: 1px solid var(--border-primary); */
+    /* border-radius: var(--radius-sm); */
     position: relative;
 }
 
@@ -239,7 +329,8 @@ body {
 
 /* 선택된 인벤토리 슬롯 - 굵은 컬러 테두리로 강조 */
 .inventory-slot.selected {
-    outline: 3px solid var(--primary-500);
+    /* outline: 3px solid var(--primary-500); */
+    background-color: var(--primary-select);
     outline-offset: -3px;
 }
 
@@ -291,16 +382,19 @@ body {
 
 /* --- 메시지 영역: 선택된 아이템 표시 (맵과 인벤토리 사이) --- */
 #message-area {
-    height: var(--message-area-height);
+    position: absolute;
+    bottom: 240px;
+    height: 24px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0 var(--spacing-4);
-    background-color: var(--bg-frame);
-    border-top: 1px solid var(--border-primary);
-    color: var(--text-primary);
+    /* background-color: var(--bg-frame); */
+    /* border-top: 1px solid var(--border-primary); */
+    color: #666;
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
+    /* font-weight: var(--font-weight-medium); */
 }
 
 /* ═══════════════════════════════════════════════
@@ -309,6 +403,7 @@ body {
 
 #scene-store {
     background-color: var(--bg-frame);
+    position: relative;
 }
 
 /* --- 상단 바: 소지금 + 나가기 --- */
@@ -319,8 +414,8 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--spacing-6);
-    background-color: var(--neutral-100);
-    border-bottom: 1px solid var(--border-primary);
+    /* background-color: var(--neutral-100); */
+    /* border-bottom: 1px solid var(--border-primary); */
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-medium);
 }
@@ -331,7 +426,27 @@ body {
     margin: 0 var(--spacing-1);
 }
 
+/* 배경 두루마리 — 우측에 고정, 모든 콘텐츠 뒤로 깔림 */
+.store-background-scroll {
+    position: absolute;
+    top: 100px;
+    right: -5px; /* 우측 정렬 */
+    height: 100%; /*씬 전체 높이 */
+    z-index: 0; /* 모든 콘텐츠 뒤로 */
+    pointer-events: none; /* 클릭 통과 — 위 요소들이 가려지지 않게 */
+    user-select: none;
+}
+
+.store-background-scroll #menu-store {
+    height: 80%;
+    width: 740px; /* 이미지 비율 유지 */
+    display: block;
+}
+
 #btn-leave-store {
+    position: absolute;
+    bottom: var(--spacing-4);
+    right: var(--spacing-4);
     padding: var(--spacing-2) var(--spacing-4);
     background-color: var(--neutral-0);
     border: 1px solid var(--border-secondary);
@@ -339,6 +454,7 @@ body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     cursor: pointer;
+    z-index: 100;
 }
 
 #btn-leave-store:hover {
@@ -351,29 +467,59 @@ body {
     display: flex;
     flex-direction: row;
     overflow: hidden;
+    z-index: 100;
 }
 
 #store-npc-area {
     flex: 1;
-    background-color: var(--neutral-50);
-    border-right: 1px solid var(--border-primary);
+    /* background-color: var(--neutral-50); */
+    /* border-right: 1px solid var(--border-primary); */
+    /* ─── 새로 추가: 말풍선 위, NPC 아래로 세로 정렬 ─── */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 가로 가운데 */
+    justify-content: center; /* 세로 가운데 */
+    gap: 0px; /* 말풍선과 NPC 사이 간격 */
+    padding: var(--spacing-6) var(--spacing-5);
+    padding-left: 0px;
+}
+
+/* 말풍선 — NPC 바로 위 */
+.store-npc-speech {
+    max-width: 90%;
+    /* height: 50%; */
+    user-select: none;
+    pointer-events: none;
+}
+
+/* NPC 캐릭터 이미지 */
+.store-npc-image {
+    max-width: 100%;
+    /* max-height: 60%; */
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }
 
 #store-content {
-    flex: 1;
+    flex: 2.2;
     display: flex;
     flex-direction: column;
+    padding: 96px 0px 32px 0px;
+    height: 90%;
+    justify-content: center;
 }
 
 /* 구매/판매 섹션 (각각 위/아래 절반) */
 .store-section {
     flex: 1;
-    padding: var(--spacing-4);
+    padding: var(--spacing-2) 0px;
     overflow-y: auto;
 }
 
 .store-section + .store-section {
-    border-top: 1px solid var(--border-primary);
+    /* border-top: 1px solid var(--border-primary); */
 }
 
 .store-section h3 {
@@ -395,9 +541,9 @@ body {
 .store-item-button {
     width: 80px;
     height: 100px;
-    padding: var(--spacing-2);
-    background-color: var(--neutral-0);
-    border: 1px solid var(--border-primary);
+    padding: var(--spacing-2) var(--spacing-1);
+    background-color: var(--neutral-50-80);
+    border: 2px solid #333;
     border-radius: var(--radius-base);
     cursor: pointer;
     display: flex;
@@ -409,28 +555,63 @@ body {
 }
 
 .store-item-button:hover {
-    background-color: var(--primary-50);
-    border-color: var(--primary-500);
+    background-color: var(--primary-select);
+    /* border-color: var(--primary-500); */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+}
+/* 상점 아이템 버튼 — 아이콘 + 갯수 묶음 */
+.store-item-icon-wrapper {
+    position: relative; /* ← 핵심: 자식 count 의 absolute 기준이 됨 */
+    width: 64px;
+    height: 64px;
 }
 
 .store-item-button img {
-    width: 40px;
-    height: 40px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
+}
+.store-item-button-count {
+    width: 32px;
+    height: 24px;
+    border-radius: var(--radius-base);
+    border: 1px solid #333;
+    background-color: #d6ecdecf;
+    position: absolute;
+    bottom: 2px;
+    right: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
 }
 
 #store-message {
+    position: absolute;
+    right: 0;
+    top: 20px;
+    width: 300px;
     height: var(--message-area-height);
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: end;
     padding: 0 var(--spacing-4);
-    background-color: var(--neutral-0);
-    border-bottom: 1px solid var(--border-primary);
-    color: var(--text-primary);
+    /* background-color: var(--neutral-0); */
+    /* border-bottom: 1px solid var(--border-primary); */
+    color: #666;
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
 }
+/* 
+#store-top-bar,
+#store-message,
+#store-body,
+#btn-leave-store {
+    position: relative;
+    z-index: 1;
+} */
 /* ═══════════════════════════════════════════════
    밭 맵 UI (#map-interactables 안에 동적 생성됨)
    ═══════════════════════════════════════════════ */
@@ -439,7 +620,7 @@ body {
 #field-timer {
     position: absolute;
     top: var(--spacing-4);
-    left: 50%;
+    right: 40px;
     transform: translateX(-50%);
     padding: var(--spacing-2) var(--spacing-4);
     background-color: rgba(255, 255, 255, 0.85);
@@ -479,21 +660,24 @@ body {
 /* --- 3x3 밭 그리드 (중앙) --- */
 #field-grid {
     position: absolute;
-    top: 50%;
+    top: 53%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
     gap: var(--spacing-1);
+    /* border: 0.1px solid var(--neutral-10);a */
+    border-radius: var(--radius-sm);
+    background-color: rgba(120, 80, 40, 0.3);
 }
 
 .field-cell {
     width: 100px;
     height: 100px;
-    background-color: rgba(120, 80, 40, 0.5); /* 흙 느낌 */
-    border: 2px solid var(--neutral-900);
-    border-radius: var(--radius-sm);
+    /* background-color: rgba(120, 80, 40, 0.5); 흙 느낌 */
+    /* border: 2px solid var(--neutral-900); */
+    border-radius: var(--radius-lg);
     cursor: pointer;
     transition: background-color 0.15s;
     /* 자식 아이콘을 가운데로 */
@@ -502,8 +686,8 @@ body {
     justify-content: center;
 }
 
-.field-cell:hover {
-    background-color: rgba(120, 80, 40, 0.75);
+#field-grid:hover {
+    background-color: rgba(120, 80, 40, 0.55);
 }
 
 /* 밭 셀 안의 아이콘 (씨앗/작물 이미지) */
@@ -548,7 +732,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     padding: var(--spacing-3) var(--spacing-6);
-    background-color: var(--primary-500);
+    background-color: var(--primary-select);
     color: var(--neutral-900);
     border: none;
     border-radius: var(--radius-base);
@@ -562,7 +746,7 @@ body {
 }
 
 .special-action-btn:hover {
-    background-color: var(--primary-700);
+    background-color: var(--secondary-select);
     color: var(--text-inverse);
 }
 
@@ -591,7 +775,7 @@ body {
    ═══════════════════════════════════════════════ */
 .exit-btn.out-of-range,
 .special-action-btn.out-of-range,
-.field-cell.out-of-range,
+/* .field-cell.out-of-range, */
 #btn-water.out-of-range,
 #btn-harvest.out-of-range {
     opacity: 0.4;
@@ -646,7 +830,7 @@ body {
     padding: 24px;
     display: flex;
     gap: 24px;
-    z-index: 100;
+    z-index: 200;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -697,27 +881,36 @@ body {
 .store-popup-counter {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    border: 1px solid #666;
+    justify-content: space-between;
+    /* gap: 16px; */
+    border: 1px solid #4b4b4b;
     border-radius: 999px;
     padding: 4px 14px;
     align-self: center;
+    background-color: var(--tritniary-select);
+    width: 180px;
+    height: 48px;
+    box-shadow: var(--shadow-md);
 }
 
 .store-popup-minus,
 .store-popup-plus {
-    width: 24px;
-    height: 24px;
-    border: 1px solid #666;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #4b4b4b;
     border-radius: 50%;
-    background: transparent;
+    background-color: var(--tritniary-select-50);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    padding-bottom: 2px;
+}
+
+.store-popup-minus:hover,
+.store-popup-plus:hover {
+    background-color: var(--primary-select-bright);
 }
 
 .store-popup-minus:disabled,
@@ -743,15 +936,24 @@ body {
 .store-popup-confirm {
     padding: 8px 20px;
     border: 1.5px solid #333;
-    background: #fff;
+    background: #b3eedf;
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
 }
+.store-popup-cancel {
+    background: #f5f5f5;
+}
 
-.store-popup-cancel:hover,
+.store-popup-cancel:hover {
+    background: var(--secondary-select);
+    font-weight: var(--font-weight-bold);
+    color: white;
+}
+
 .store-popup-confirm:hover:not(:disabled) {
-    background: #f0e8d4;
+    background: var(--primary-select-bright);
+    font-weight: var(--font-weight-bold);
 }
 
 .store-popup-confirm:disabled {

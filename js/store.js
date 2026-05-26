@@ -226,6 +226,10 @@ function onBuyClick(itemId, count) {
         renderSellItemList();
         // 성공 메시지
         displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+        playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
+        // 성공 시 팝업 닫기
+        closeStorePopup();
     } else {
         // 일반 아이템: 인벤토리에 추가
         // 1) 인벤토리에 아이템 1개 추가
@@ -240,6 +244,8 @@ function onBuyClick(itemId, count) {
             renderSellItemList();
             // 성공 메시지
             displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+            playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
             // 성공 시 팝업 닫기
             closeStorePopup();
         } else {
@@ -319,6 +325,8 @@ function onSellClick(itemId, sellCount) {
         displayStoreMessage(
             `판매 완료: ${selectedItem.displayName} ${sellCount}개 (+${totalEarned}푼)`,
         );
+        playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
         // 성공 시 팝업 닫기
         closeStorePopup();
     }
@@ -357,8 +365,7 @@ function onSellClick(itemId, sellCount) {
 
 function renderStore() {
     renderMoney();
-    // renderStoreNpc();
-    renderExitStoreButton();
+    renderStoreNpc();
     renderBuyItemList();
     renderSellItemList();
     // TODO 미래: NPC 영역 렌더 (renderStoreNpc) — Stage 2 에서 추가
@@ -390,9 +397,10 @@ function renderBuyItemButton(itemId) {
     // 4. <span> element 만들기:
     //    - textContent = item.displayName
     //    - 버튼에 appendChild
-    const name = document.createElement("span");
-    name.textContent = item.displayName;
-    btn.appendChild(name);
+    // const name = document.createElement("span");
+    // name.textContent = item.displayName;
+    // btn.appendChild(name);
+    //  이름 없었던것같아서 지움
 
     // 5. <span> element 만들기:
     //    - textContent = item.buyPrice + "푼"
@@ -445,6 +453,10 @@ function renderSellItemButton(itemId) {
     const btn = document.createElement("button");
     btn.className = "store-item-button";
 
+    // ─── 아이콘 + 갯수 묶음 (count 가 icon 기준으로 위치 잡도록) ───
+    const iconWrapper = document.createElement("div");
+    iconWrapper.className = "store-item-icon-wrapper";
+
     // 3. <img> element 만들기:
     //    - src = item.icon
     //    - alt = item.displayName
@@ -452,14 +464,18 @@ function renderSellItemButton(itemId) {
     const icon = document.createElement("img");
     icon.src = item.icon;
     icon.alt = item.displayName;
-    btn.appendChild(icon);
+    iconWrapper.appendChild(icon);
 
     // 4. <span> element 만들기 — 인벤토리에서 갯수를 직접 조회해서 표시:
     //    - textContent = "×" + STATE.inventory.getItemCount(itemId)
     //    - 버튼에 appendChild
     const count = document.createElement("span");
-    count.textContent = "×" + STATE.inventory.getItemCount(itemId);
-    btn.appendChild(count);
+    count.className = "store-item-button-count"; //Thisclass
+    count.textContent = STATE.inventory.getItemCount(itemId) + "개";
+    iconWrapper.appendChild(count);
+
+    btn.appendChild(iconWrapper);
+    // ─────────────────────────────────────────────
 
     // 5. <span> element 만들기:
     //    - textContent = item.sellPrice + "푼"
@@ -686,7 +702,7 @@ function onAddCountClick() {
 
     // 2. 할 수 있는 최대값 이상 넘어가면 안된다고하기 :
     let max = getStorePopupMax();
-    
+
     // 3. 수치가 max 보다 작을 때만 +=1
     if (STATE.storePopup.count < max) {
         STATE.storePopup.count += 1;
@@ -702,7 +718,7 @@ function onAddCountClick() {
 /**
  * 수량 -1 버튼 클릭 시.
  */
-function onSubtractCountClick(){
+function onSubtractCountClick() {
     // 1. STATE.storePopup 가 null 이면 return (방어)
     if (STATE.storePopup === null) return;
 
@@ -714,10 +730,10 @@ function onSubtractCountClick(){
     // 3. 현재 수량이 1인데 -1을 누르면, 최대 수량
     else if (STATE.storePopup.count === 1) {
         let max = getStorePopupMax();
-        
+
         // 최대 수량이 0이나 음수면 그냥 1로 유지
         if (max > 0) {
-            STATE.storePopup.count = max; 
+            STATE.storePopup.count = max;
         }
     }
     // 4. renderStorePopup() 호출해서 팝업 다시 그리기
@@ -729,9 +745,20 @@ function onSubtractCountClick(){
 // ═══════════════════════════════════════════════
 
 function renderStoreNpc() {
-    // 2단계에서 NPC 캐릭터/말풍선 추가 예정
-}
+    const container = $("store-npc-area");
+    container.innerHTML = ""; // 매번 새로 그림
 
-function renderExitStoreButton() {
-    // 1단계엔 HTML 에 정적으로 있고 game.js 에서 핸들러 연결됨 — 비워둠
+    // 말풍선 (위)
+    const speechBubble = document.createElement("img");
+    speechBubble.className = "store-npc-speech";
+    speechBubble.src = "img_assets/ui/shop_speechbubble_ui.png"; // 경로 조정
+    speechBubble.alt = "";
+    container.appendChild(speechBubble);
+
+    // NPC 이미지 (아래)
+    const npc = document.createElement("img");
+    npc.className = "store-npc-image";
+    npc.src = "img_assets/characters/shop_character_v1_shade.png"; // 경로 조정
+    npc.alt = "상점 주인";
+    container.appendChild(npc);
 }

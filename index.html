@@ -30,13 +30,24 @@
              씬 2: 게임 화면 (소지금 + 맵 + 인벤토리)
              ═══════════════════════════════════════════ -->
             <div id="scene-game" class="scene">
-                <!-- 상단: 소지금 표시 -->
-                <div id="money-display">
-                    소지금: <span id="money-amount">100</span>푼
-                </div>
-
+                <!-- <div id="money-display">
+                    
+                </div> -->
                 <!-- 가운데: 맵 영역 (배경 + 출구버튼 + 상호작용요소) -->
                 <div id="map-area">
+                    <!-- 상단: 소지금 표시 -->
+
+                    <div class="money-frame-wrapper">
+                        <img
+                            id="money-frame"
+                            src="img_assets/ui/money_display_ui.png"
+                            alt=""
+                        />
+                        <span class="money-text">
+                            <span id="money-amount">100</span>푼
+                        </span>
+                    </div>
+
                     <!-- 맵 배경 이미지 (JS의 renderMap에서 src 설정) -->
                     <img id="map-bg" src="" alt="" />
 
@@ -57,6 +68,12 @@
                             src=""
                             alt=""
                         />
+                        <!-- <img
+                            id="character-hat"
+                            class="character-layer"
+                            src=""
+                            alt=""
+                        /> -->
                         <!-- hat would come after clothes. -->
                     </div>
 
@@ -68,7 +85,9 @@
                 <div id="message-area"></div>
 
                 <!-- 하단: 인벤토리 바 (2줄 x 10칸 = 총 20칸) -->
-                <div id="inventory-bar"></div>
+                <div id="inventory-container">
+                    <div id="inventory-bar"></div>
+                </div>
             </div>
 
             <!-- ═══════════════════════════════════════════
@@ -86,17 +105,32 @@
                 씬 4: 상점 화면
                 ═══════════════════════════════════════════ -->
             <div id="scene-store" class="scene">
-                <!-- 상단: 소지금 + 나가기 버튼 -->
+                <!-- 배경 두루마리 — 가장 뒤에, 우측에 위치 -->
+                <div class="store-background-scroll">
+                    <img
+                        src="img_assets/ui/shop_menu_ui.png"
+                        alt=""
+                        id="menu-store"
+                    />
+                </div>
+
+                <!-- 상단: 소지금 (프레임) -->
                 <div id="store-top-bar">
-                    <span
-                        >소지금:
-                        <span id="store-money-amount">100</span>푼</span
-                    >
-                    <button id="btn-leave-store">상점 나가기</button>
+                    <div class="money-frame-wrapper">
+                        <img
+                            src="img_assets/ui/money_display_ui.png"
+                            alt=""
+                            id="money-frame-store"
+                        />
+                        <span class="money-text">
+                            <span id="store-money-amount">100</span>푼
+                        </span>
+                    </div>
+                    <div id="store-message"></div>
                 </div>
 
                 <!-- 상점 상태 메시지 영역 -->
-                <div id="store-message"></div>
+
                 <div id="store-popup"></div>
 
                 <!-- 본문: NPC 왼쪽, 구매/판매 오른쪽 -->
@@ -116,6 +150,8 @@
                         </section>
                     </div>
                 </div>
+                <!-- 나가기버튼 -->
+                <button id="btn-leave-store">상점 나가기</button>
             </div>
         </div>
         <!-- /game-container -->
