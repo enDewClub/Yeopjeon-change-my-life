@@ -686,7 +686,7 @@ function onAddCountClick() {
 
     // 2. 할 수 있는 최대값 이상 넘어가면 안된다고하기 :
     let max = getStorePopupMax();
-    
+
     // 3. 수치가 max 보다 작을 때만 +=1
     if (STATE.storePopup.count < max) {
         STATE.storePopup.count += 1;
@@ -702,7 +702,7 @@ function onAddCountClick() {
 /**
  * 수량 -1 버튼 클릭 시.
  */
-function onSubtractCountClick(){
+function onSubtractCountClick() {
     // 1. STATE.storePopup 가 null 이면 return (방어)
     if (STATE.storePopup === null) return;
 
@@ -714,10 +714,10 @@ function onSubtractCountClick(){
     // 3. 현재 수량이 1인데 -1을 누르면, 최대 수량
     else if (STATE.storePopup.count === 1) {
         let max = getStorePopupMax();
-        
+
         // 최대 수량이 0이나 음수면 그냥 1로 유지
         if (max > 0) {
-            STATE.storePopup.count = max; 
+            STATE.storePopup.count = max;
         }
     }
     // 4. renderStorePopup() 호출해서 팝업 다시 그리기
@@ -730,6 +730,7 @@ function onSubtractCountClick(){
 
 function renderStoreNpc() {
     // 2단계에서 NPC 캐릭터/말풍선 추가 예정
+    store - npc - area;
 }
 
 function renderExitStoreButton() {

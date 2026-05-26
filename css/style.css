@@ -191,8 +191,35 @@ body {
 }
 
 /* --- 하단: 인벤토리 바 (2줄 x 10칸) --- */
-#inventory-bar {
+
+/* --- 인벤토리 컨테이너: 프레임 이미지 + 인벤토리 바 겹치기 --- */
+#inventory-container {
     height: var(--inventory-bar-height);
+    /* width: 640px; */
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* 프레임 이미지 - 인벤토리 위에 겹쳐서 장식. 클릭은 통과시킴 */
+#inventory-frame {
+    position: absolute;
+    inset: 0;
+    width: 640px;
+    height: 50%;
+    pointer-events: none; /* ← 핵심: 슬롯 클릭이 차단되지 않도록 */
+    user-select: none;
+    z-index: 2;
+}
+
+#inventory-bar {
+    /* height: var(--inventory-bar-height);
+     */
+    position: absolute; /* ← 추가 */
+    inset: var(
+        --inventory-frame-padding
+    ); /* ← 추가: 프레임 안쪽으로 들어가게 */
+    z-index: 1; /* ← 추가: 프레임 아래에 깔림 */
+
     flex-shrink: 0;
     padding: var(--inventory-padding);
     background-color: var(--neutral-100);
@@ -200,7 +227,8 @@ body {
     display: grid;
     grid-template-columns: repeat(10, var(--inventory-slot-size));
     grid-template-rows: repeat(2, var(--inventory-slot-size));
-    gap: var(--inventory-slot-gap);
+    gap: 0;
+    /* gap: var(--inventory-slot-gap); */
     justify-content: center;
     align-content: center;
 }
