@@ -173,6 +173,7 @@ function isSpecialActionUnlocked(specialAction) {
 function handleSpecialAction(actionType) {
     switch (actionType) {
         case "goEnding":
+            playSfx("welcome"); // ← 추가. 실제 성공했을 때만 울림.
             switchScene("ending");
             break;
         case "goStore":

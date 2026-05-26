@@ -133,14 +133,14 @@ const DATA = {
     // 숫자를 바꾸고 싶으면 여기서만 수정한다.
     // ═══════════════════════════════════════════════
     CONFIG: {
-        STARTING_MONEY: 40000, // 시작 소지금 (푼)
+        STARTING_MONEY: 100, // 시작 소지금 (푼)
         INVENTORY_SIZE: 20, // 인벤토리 총 칸 수 (CSS는 10x2 그리드)
         STARTING_MAP: "home", // 게임 시작 시 진입할 맵
         // 시작 시 인벤토리에 넣어줄 아이템들 (테스트 + Step 1 시작 자원)
         STARTING_INVENTORY: [
-            { itemId: "potato_seed", count: 3 },
-            { itemId: "garlic_seed", count: 2 },
-            { itemId: "tomato_seed", count: 1 },
+            // { itemId: "potato_seed", count: 3 },
+            // { itemId: "garlic_seed", count: 2 },
+            // { itemId: "tomato_seed", count: 1 },
         ],
         // 밭 설정값
         FIELD: {
@@ -471,18 +471,18 @@ const DATA = {
                         toLevel: 2,
                     },
                 },
-                // magic_silk_3: {
-                //     displayName: "신비한 비단 2",
-                //     description:
-                //         "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
-                //     buyPrice: 1200,
-                //     consumedAt: "purchase",
-                //     effect: {
-                //         kind: "upgrade",
-                //         targetId: "clothes",
-                //         toLevel: 3,
-                //     },
-                // },
+                magic_silk_3: {
+                    displayName: "신비한 비단 2",
+                    description:
+                        "알 수 없는 신비로운 힘에 휩싸여 있는 비단입니다. \n이 비단을 구매하면 옷이 보다 기품있어질 것 같습니다.",
+                    buyPrice: 1200,
+                    consumedAt: "purchase",
+                    effect: {
+                        kind: "upgrade",
+                        targetId: "clothes",
+                        toLevel: 3,
+                    },
+                },
             },
         }),
         // 산 채집 아이템: img_assets/items/mountain/

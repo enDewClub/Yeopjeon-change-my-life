@@ -226,6 +226,8 @@ function onBuyClick(itemId, count) {
         renderSellItemList();
         // 성공 메시지
         displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+        playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
         // 성공 시 팝업 닫기
         closeStorePopup();
     } else {
@@ -242,6 +244,8 @@ function onBuyClick(itemId, count) {
             renderSellItemList();
             // 성공 메시지
             displayStoreMessage(`구매 완료: ${selectedItem.displayName}`);
+            playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
             // 성공 시 팝업 닫기
             closeStorePopup();
         } else {
@@ -321,6 +325,8 @@ function onSellClick(itemId, sellCount) {
         displayStoreMessage(
             `판매 완료: ${selectedItem.displayName} ${sellCount}개 (+${totalEarned}푼)`,
         );
+        playSfx("coin"); // ← 추가. 실제 성공했을 때만 울림.
+
         // 성공 시 팝업 닫기
         closeStorePopup();
     }

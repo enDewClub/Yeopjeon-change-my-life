@@ -8,7 +8,31 @@
 //
 // "이 게임 어디서 시작해?" → 맨 아래 DOMContentLoaded 리스너 부터.
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// 사운드 (Audio)
+// - SFX: 짧은 효과음. currentTime=0 으로 빠른 연속 재생 가능.
+// - BGM: 배경음악. 루프 + 볼륨 낮춤. 시작은 반드시 유저 클릭 핸들러 안에서.
+// ═══════════════════════════════════════════════
+const SFX = {
+    dock: new Audio("audio_assets/dock.mp3"),
+    coin: new Audio("audio_assets/coin.wav"),
+    welcome: new Audio("audio_assets/amazingwelcome.mp3"),
+};
+// 미리 로드해두기 — 첫 클릭 때 지연 방지
+for (const a of Object.values(SFX)) {
+    a.preload = "auto";
+    a.volume = 0.8;
+    a.load();
+}
+function playSfx(name) {
+    const a = SFX[name];
+    a.currentTime = 0;
+    a.play();
+}
 
+const BGM = new Audio("audio_assets/bgm.mp3");
+BGM.loop = true;
+BGM.volume = 0.4;
 // ═══════════════════════════════════════════════
 // 씬 흐름 함수
 // ═══════════════════════════════════════════════
@@ -28,6 +52,18 @@ function startNewGame() {
  * STATE 리셋 → 게임 씬으로 전환 → 맵/인벤토리/소지금 그리기.
  */
 function onTitleStart() {
+    BGM.play();
+
+    // SFX 워밍업 — 짧게 재생하고 바로 멈춤. 다음 클릭부터 즉시 발화.
+    for (const a of Object.values(SFX)) {
+        a.play()
+            .then(() => {
+                a.pause();
+                a.currentTime = 0;
+            })
+            .catch(() => {});
+    }
+
     resetGameState();
     switchScene("game");
     renderMap(STATE.currentMap); // STATE.currentMap 는 resetGameState 에서 "home" 으로 설정됨
@@ -79,6 +115,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const success = STATE.field.plant(selectedItem.id);
         if (!success) return;
+        playSfx("dock"); // ← 추가. 실제 성공했을 때만 울림.
 
         STATE.inventory.removeItem(selectedItem.id, 1);
         STATE.inventory.deselectSlot();
@@ -107,6 +144,7 @@ window.addEventListener("DOMContentLoaded", () => {
     function onHarvestClick() {
         const result = STATE.field.harvest();
         if (!result) return; // ready 상태가 아니면 무시
+        playSfx("dock"); // ← 추가. 실제 수확 성공했을 때만 울림.
 
         const { cropId, count } = result;
 
@@ -164,6 +202,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const result = STATE.mountain.pickPlant(x, y);
 
         if (result.ok) {
+            playSfx("dock"); // ← 추가. 채집 성공했을 때만 울림.
             const name = DATA.ITEMS[result.plantId].displayName;
             renderMountain();
             renderInventory();

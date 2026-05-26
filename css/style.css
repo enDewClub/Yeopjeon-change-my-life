@@ -31,9 +31,9 @@ body {
         var(--money-bar-height) + var(--canvas-height) +
             var(--inventory-bar-height) + var(--message-area-height)
     );
-    background-color: var(--bg-primary);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    /* background-color: var(--bg-primary); */
+    /* border-radius: var(--radius-lg); */
+    /* box-shadow: var(--shadow-lg); */
     overflow: hidden;
     position: relative;
 }
@@ -257,7 +257,7 @@ body {
     height: var(--inventory-bar-height);
     flex-shrink: 0;
     /* background-color: var(--neutral-100); */
-    border-top: 1px solid var(--border-primary);
+    /* border-top: 1px solid var(--border-primary); */
     padding: var(--inventory-padding);
     display: flex;
     flex-direction: column;
@@ -382,16 +382,19 @@ body {
 
 /* --- 메시지 영역: 선택된 아이템 표시 (맵과 인벤토리 사이) --- */
 #message-area {
-    height: 80px;
+    position: absolute;
+    bottom: 240px;
+    height: 24px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0 var(--spacing-4);
-    background-color: var(--bg-frame);
-    border-top: 1px solid var(--border-primary);
-    color: var(--text-primary);
+    /* background-color: var(--bg-frame); */
+    /* border-top: 1px solid var(--border-primary); */
+    color: #666;
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
+    /* font-weight: var(--font-weight-medium); */
 }
 
 /* ═══════════════════════════════════════════════
@@ -586,17 +589,18 @@ body {
 
 #store-message {
     position: absolute;
-    right: 20px;
+    right: 0;
     top: 20px;
-    width: 240px;
+    width: 300px;
     height: var(--message-area-height);
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: end;
     padding: 0 var(--spacing-4);
     /* background-color: var(--neutral-0); */
     /* border-bottom: 1px solid var(--border-primary); */
-    color: var(--text-primary);
+    color: #666;
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
 }
