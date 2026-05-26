@@ -192,6 +192,10 @@ const DATA = {
                 "ssuk",
                 "pyogo",
                 "doraji",
+                "dalrae",
+                "duduck",
+                "dureup",
+                "gosari"
             ],
         },
     },
@@ -258,7 +262,7 @@ const DATA = {
         // 밭 - 농사 짓는 곳
         field: {
             displayName: "밭",
-            bgImage: "img_assets/bg/field.png",
+            bgImage: "img_assets/bg/map_field_topdown.png",
             characterStart: { x: 440, y: 60 }, // 상단 출구 근처 (집터에서 진입한 느낌).
             exits: {
                 top: "home", // 위쪽 → 집터 (밭에서 나가기)
@@ -268,7 +272,7 @@ const DATA = {
         // 산 - 야생 식물 채집하는 곳
         mountain: {
             displayName: "산",
-            bgImage: "img_assets/bg/mountain.png",
+            bgImage: "img_assets/bg/map_mountain(sample).png",
             exits: {
                 left: "mountain_enterance", // 왼쪽 → 산입구로 돌아가기
             },
@@ -277,7 +281,7 @@ const DATA = {
         },
         mountain_enterance: {
             displayName: "산입구",
-            bgImage: "img_assets/bg/mountain_enterance.png",
+            bgImage: "img_assets/bg/map_gathering(sample).png",
             exits: {
                 right: "mountain", // 오른쪽 → 산(채집)으로 돌아가기
                 bottom: "village",
@@ -473,34 +477,39 @@ const DATA = {
             wildPlants: {
                 ssuk: {
                     displayName: "쑥",
-                    description: "산에서 캔 쑥",
-                    sellPrice: 5,
+                    description: "건국신화에 나오는 바로 그 쑥입니다. 먹으면 '쑥쑥' 자라는 쑥… \n쑥은 성질이 따듯해 냉증 치료에 효과적이라고 합니다. \n쑥대도 삼밭에 나면 곧아진다고 하니 매일 엽전인생 플레이 하는 것을 잊지마세요.",
+                    sellPrice: 1,
                 },
-                // wild_fern: {
-                //     displayName: "고사리",
-                //     description: "산에서 캔 고사리",
-                //     sellPrice: 5,
-                // },
+                gosari: {
+                     displayName: "고사리",
+                     description: "다양한 민요에 등장하는 고사리는 삶아서 말려 먹으면 약이 되고, 생으로 먹으면 독이 됩니다. \n보통 새순이 올라와 어린 잎이 자라기 전에 수확해서 먹습니다. \n시기를 놓치지 않기 위해서 2~3일에 한 번씩 수확을 해야 하니 \n고사리도 꺾을 때 꺾는다는 속담이 생긴 듯 합니다. ",
+                     sellPrice: 1,
+                },
                 pyogo: {
                     displayName: "표고버섯",
-                    description: "산에서 캔 버섯",
-                    sellPrice: 5,
+                    description: "생명의 비약이라고도 불리는 표고버섯입니다. \n향과 맛, 효능까지 일품이어서 올바르게 섭취하면 건강에 많은 도움을 줍니다. 특유의 감칠맛과 풍부한 영양소로 인해 산에서 나는 고기라고도 불립니다.",
+                    sellPrice: 2,
                 },
                 doraji: {
                     displayName: "도라지",
-                    description: "산에서 캔 도라지",
-                    sellPrice: 5,
+                    description: "산삼처럼 생겼으나 산삼이 아닌 도라지입니다. \n맛이 맵고 온화하며 독이 있다는 문헌 기록이 있습니다. \n약재로도 쓰이며 오래 묵은 도라지는 산삼보다 좋다는 말이 있을 정도로 몸에 좋은 식물이라고 하네요.",
+                    sellPrice: 2,
                 },
-                // wild_root: {
-                //     displayName: "도라지",
-                //     description: "산에서 캔 도라지",
-                //     sellPrice: 5,
-                // },
-                // wild_berry: {
-                //     displayName: "산딸기",
-                //     description: "산에서 캔 산딸기",
-                //     sellPrice: 5,
-                // },
+                duduck: {
+                     displayName: "더덕",
+                     description: "특유의 향과 쌉싸름하면서 단맛이 나는 덩굴식물입니다. \n뿌리가 도라지나 인삼과 비슷한 게 특징이며, 어릴땐 먹기 싫었지만 갈수록 그 맛에 중독되었어요. 맵게 양념한게 맛있더라고요. \n아삭하고.. 엽전 크기 이상으로 통통하고 곧게 뻗은 것을 고르세요 ",
+                     sellPrice: 2,
+                },
+                dureup: {
+                     displayName: "두릅",
+                     description: "두릅은 두릅나무의 어린 순을 가리키는 말입니다. \n봄 두릅은 금이요 가을 두릅은 은이다 라는 말이 있을 정도로 \n봄철에 나는 두릅의 영양소와 향이 뛰어납니다. \n세릅 네릅 아닌 두릅입니다…",
+                     sellPrice: 2,
+                },
+                dalrae: {
+                     displayName: "달래",
+                     description: "냉이와 함께 봄에 나는 나물로, 맛이 매콤하고 향긋합니다. \n달래는 달랑달랑 매달린 동그란 모양의 알뿌리에서 유래된 말이며, \n특유의 매운맛과 따듯한 성질 때문에 작은 마늘이라고도 불립니다.",
+                     sellPrice: 1,
+                },
             },
             folder: "gathering",
         }),
