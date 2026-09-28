@@ -428,6 +428,9 @@ function refreshProximityStates() {
         document
             .querySelectorAll(".out-of-range")
             .forEach((el) => el.classList.remove("out-of-range"));
+        document
+            .querySelectorAll(".interact-target")
+            .forEach((el) => el.classList.remove("interact-target"));
         return;
     }
 
@@ -470,4 +473,50 @@ function refreshProximityStates() {
     document
         .querySelectorAll(".field-tile")
         .forEach((el) => check(el, TILE_RADIUS));
+
+    // E 키 대상 갱신 (반경 체크가 끝난 뒤여야 .out-of-range 가 최신)
+    updateInteractTarget(cx, cy, mapRect);
+}
+
+// ═══════════════════════════════════════════════
+// E 키 상호작용 대상 찾기 — 매 프레임 (refreshProximityStates 끝에서 호출)
+//
+// 반경 안(.out-of-range 아닌) 상호작용 요소 중 캐릭터 중심에 가장 가까운 것 하나에
+// .interact-target 클래스 → CSS 가 강조 표시.
+// E 키는 이 클래스 붙은 요소를 그냥 click() → 기존 클릭 핸들러가 그대로 처리.
+// 새 상호작용 요소 추가하면 아래 목록에 셀렉터만 추가.
+// ═══════════════════════════════════════════════
+const INTERACTABLE_SELECTOR = [
+    ".exit-btn",
+    ".special-action-btn:not(.locked)", // 잠긴 버튼 (입궁 자격 부족) 은 제외
+    ".field-cell",
+    ".field-tile",
+    ".wild-plant",
+    "#btn-water",
+    "#btn-harvest",
+].join(", ");
+
+function updateInteractTarget(cx, cy, mapRect) {
+    let nearestEl = null;
+    let nearestDistance = Infinity;
+
+    document.querySelectorAll(INTERACTABLE_SELECTOR).forEach((el) => {
+        if (el.classList.contains("out-of-range")) return; // 멀면 후보 아님
+
+        const r = el.getBoundingClientRect();
+        const ex = r.left - mapRect.left + r.width / 2;
+        const ey = r.top - mapRect.top + r.height / 2;
+        const distance = Math.hypot(ex - cx, ey - cy);
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestEl = el;
+        }
+    });
+
+    // 이전 대상 강조 해제 → 새 대상 강조
+    document.querySelectorAll(".interact-target").forEach((el) => {
+        if (el !== nearestEl) el.classList.remove("interact-target");
+    });
+    nearestEl?.classList.add("interact-target");
 }
