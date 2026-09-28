@@ -1104,3 +1104,17 @@ body {
 #character.digging #character-held-item {
     transform: rotate(180deg);
 }
+
+/* ═══════════════════════════════════════════════
+   E 키 상호작용 대상 강조
+   ui.js 의 updateInteractTarget 이 매 프레임 가장 가까운 요소에 붙임
+   ═══════════════════════════════════════════════ */
+.interact-target {
+    outline: 3px solid var(--primary-select-bright);
+    outline-offset: -3px;
+}
+
+/* 타일은 옆 타일에 가려지지 않게 위로 */
+.field-tile.interact-target {
+    z-index: 2;
+}

@@ -370,6 +370,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
         // 물주기 단축키 → 물주기 버튼 클릭과 같은 동작
         if (key === DATA.CONFIG.KEYS.WATER) onWaterKey();
+
+        // 상호작용 단축키 → 강조된 대상 클릭
+        if (key === DATA.CONFIG.KEYS.INTERACT) onInteractKey();
     });
 
     /**
@@ -391,6 +394,19 @@ window.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("keyup", (e) => {
         pressedKeys.delete(e.key.toLowerCase());
     });
+
+    /**
+     * 상호작용 단축키 (E).
+     * ui.js 가 매 프레임 골라둔 .interact-target 을 click() → 마우스 클릭과 완전히 같은 경로.
+     *   출구 → 맵 이동 / 타일 + 삽 → 땅파기 / 타일 + 씨앗 → 심기 / 다 자람 → 수확 ...
+     */
+    function onInteractKey() {
+        if (STATE.currentScene !== "game") return;
+        if (STATE.character?.isBusy()) return; // 땅 파는 중엔 무시
+
+        const target = document.querySelector(".interact-target");
+        if (target) target.click();
+    }
 
     /**
      * 눌린 키에서 이동 벡터 뽑아서 캐릭터 이동.
