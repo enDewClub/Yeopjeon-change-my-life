@@ -252,6 +252,16 @@ const DATA = {
                 "gosari",
             ],
         },
+
+        // 대박 수확 연출 (수확량 == HARVEST_MAX 일 때)
+        JACKPOT: {
+            RAIN_COUNT: 50, // 떨어지는 아이템 수
+            ITEM_SIZE: 48, // 아이템 이미지 크기 (px)
+            FALL_MIN_SECONDS: 1.5, // 한 개가 떨어지는 시간 (최소~최대 사이 랜덤)
+            FALL_MAX_SECONDS: 3,
+            SPREAD_SECONDS: 1.5, // 시작 시간 랜덤 분산 (0~이 값) → 한꺼번에 안 떨어지고 흩뿌려짐
+            BGM_DUCK_VOLUME: 0.1, // 대박 음악 나오는 동안 BGM 볼륨 (끝나면 복구)
+        },
     },
 
     // ═══════════════════════════════════════════════

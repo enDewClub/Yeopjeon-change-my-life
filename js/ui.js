@@ -520,3 +520,50 @@ function updateInteractTarget(cx, cy, mapRect) {
     });
     nearestEl?.classList.add("interact-target");
 }
+
+// ═══════════════════════════════════════════════
+// 아이템 비 연출 (대박 수확)
+// #effects-layer 에 아이템 이미지 RAIN_COUNT 개를 랜덤 x 위치에서 떨어뜨림.
+// 각 이미지는 CSS 애니메이션 끝나면 스스로 삭제 (animationend).
+// 숫자는 DATA.CONFIG.JACKPOT 에서만 관리.
+// ═══════════════════════════════════════════════
+function playItemRain(itemId) {
+    const layer = $("effects-layer");
+    const {
+        RAIN_COUNT,
+        ITEM_SIZE,
+        FALL_MIN_SECONDS,
+        FALL_MAX_SECONDS,
+        SPREAD_SECONDS,
+    } = DATA.CONFIG.JACKPOT;
+    const { MAP_WIDTH, MAP_HEIGHT } = DATA.CONFIG;
+
+    const randomBetween = (min, max) => min + Math.random() * (max - min);
+
+    for (let i = 0; i < RAIN_COUNT; i++) {
+        const img = document.createElement("img");
+        img.className = "rain-item";
+        img.src = DATA.ITEMS[itemId].icon;
+        img.alt = "";
+
+        // 크기 + 시작 위치 (화면 위 밖에서 시작)
+        img.style.width = `${ITEM_SIZE}px`;
+        img.style.height = `${ITEM_SIZE}px`;
+        img.style.left = `${randomBetween(0, MAP_WIDTH - ITEM_SIZE)}px`;
+        img.style.top = `${-ITEM_SIZE}px`;
+
+        // 개별 랜덤값 → 속도/시작시간/회전이 제각각이라 자연스러움
+        img.style.animationDuration = `${randomBetween(FALL_MIN_SECONDS, FALL_MAX_SECONDS)}s`;
+        img.style.animationDelay = `${randomBetween(0, SPREAD_SECONDS)}s`;
+        img.style.setProperty(
+            "--fall-distance",
+            `${MAP_HEIGHT + ITEM_SIZE * 2}px`,
+        );
+        img.style.setProperty("--spin", `${randomBetween(-360, 360)}deg`);
+
+        // 다 떨어지면 DOM 에서 제거 (쌓이지 않게)
+        img.addEventListener("animationend", () => img.remove());
+
+        layer.appendChild(img);
+    }
+}

@@ -1118,3 +1118,32 @@ body {
 .field-tile.interact-target {
     z-index: 2;
 }
+/* ═══════════════════════════════════════════════
+   연출 레이어 — 맵 위 전체를 덮지만 클릭은 통과
+   ═══════════════════════════════════════════════ */
+#effects-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden; /* 맵 밖으로 떨어진 이미지 안 보이게 */
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* 떨어지는 아이템 — 위치/속도/회전은 ui.js 가 개별 랜덤 설정 */
+.rain-item {
+    position: absolute;
+    object-fit: contain;
+    image-rendering: pixelated;
+    animation-name: item-fall;
+    animation-timing-function: ease-in; /* 점점 빨라짐 (중력 느낌) */
+    animation-fill-mode: both; /* 딜레이 동안은 화면 위 밖에서 대기 */
+}
+
+@keyframes item-fall {
+    from {
+        transform: translateY(0) rotate(0deg);
+    }
+    to {
+        transform: translateY(var(--fall-distance)) rotate(var(--spin));
+    }
+}

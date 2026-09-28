@@ -17,6 +17,7 @@ const SFX = {
     dock: new Audio("audio_assets/dock.mp3"),
     coin: new Audio("audio_assets/coin.wav"),
     welcome: new Audio("audio_assets/amazingwelcome.mp3"),
+    jackpot: new Audio("audio_assets/amazingwelcome.mp3"),
 };
 // 미리 로드해두기 — 첫 클릭 때 지연 방지
 for (const a of Object.values(SFX)) {
@@ -32,7 +33,24 @@ function playSfx(name) {
 
 const BGM = new Audio("audio_assets/bgm.mp3");
 BGM.loop = true;
-BGM.volume = 0.4;
+const BGM_VOLUME = 0.4; // 기본 BGM 볼륨 (대박 연출 후 복구할 때도 사용)
+BGM.volume = BGM_VOLUME;
+
+/**
+ * 대박 수확 연출 — 대박 음악 + 작물 비.
+ * 음악 나오는 동안 BGM 을 줄였다가, 끝나면 원래 볼륨으로 복구.
+ * @param {string} cropId - 떨어뜨릴 작물 ID
+ */
+function celebrateJackpot(cropId) {
+    BGM.volume = DATA.CONFIG.JACKPOT.BGM_DUCK_VOLUME;
+    SFX.jackpot.onended = () => {
+        BGM.volume = BGM_VOLUME;
+    };
+    playSfx("jackpot");
+
+    playItemRain(cropId);
+}
+
 // ═══════════════════════════════════════════════
 // 씬 흐름 함수
 // ═══════════════════════════════════════════════
@@ -159,7 +177,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!result) return; // ready 상태가 아니면 무시
         playSfx("dock"); // ← 추가. 실제 수확 성공했을 때만 울림.
 
-        const { cropId, count } = result;
+        const { cropId, count, isJackpot } = result;
 
         // 인벤토리에 작물 추가
         STATE.inventory.addItem(cropId, count);
@@ -170,7 +188,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
         // 메시지 — 사용자가 선택해둔 씨앗 메시지를 덮어씀 (의도된 동작)
         const cropName = DATA.ITEMS[cropId].displayName;
-        $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+        if (isJackpot) {
+            celebrateJackpot(cropId);
+            $("message-area").textContent =
+                `대박! ${cropName} ${count}개 수확!`;
+        } else {
+            $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+        }
     }
 
     // ═══════════════════════════════════════════════
@@ -268,14 +292,20 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!result) return;
         playSfx("dock");
 
-        const { cropId, count } = result;
+        const { cropId, count, isJackpot } = result;
         STATE.inventory.addItem(cropId, count);
 
         renderInventory();
         renderTileField();
 
         const cropName = DATA.ITEMS[cropId].displayName;
-        $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+        if (isJackpot) {
+            celebrateJackpot(cropId);
+            $("message-area").textContent =
+                `대박! ${cropName} ${count}개 수확!`;
+        } else {
+            $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+        }
     }
 
     // ═══════════════════════════════════════════════

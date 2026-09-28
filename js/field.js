@@ -90,12 +90,15 @@ class Field {
             Math.floor(Math.random() * (HARVEST_MAX - HARVEST_MIN + 1)) +
             HARVEST_MIN;
 
+        // 최대 수확량이면 대박 (연출은 호출자가 처리 — Field 는 판정만)
+        const isJackpot = count === HARVEST_MAX;
+
         // 밭 리셋
         this.state = "empty";
         this.seedId = null;
         this.growEndTime = null;
 
-        return { cropId, count };
+        return { cropId, count, isJackpot };
     }
 
     // ─────────────────────────────────────────
