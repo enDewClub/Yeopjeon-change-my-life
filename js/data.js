@@ -178,7 +178,7 @@ const DATA = {
             DIG_SECONDS: 0.5, // 땅 한 칸 파는 시간 (이동 불가)
             GROW_TIME_SECONDS: 5, // 자라는 데 걸리는 시간
             HARVEST_MIN: 1, // 타일 하나당 수확량 최소
-            HARVEST_MAX: 3, // 타일 하나당 수확량 최대
+            HARVEST_MAX: 9, // 타일 하나당 수확량 최대
             TILE_IMAGES: {
                 grass: "img_assets/tiles/grass.png", // 기본 풀
                 dirt: "img_assets/tiles/dirt.png", // 파놓은 흙
