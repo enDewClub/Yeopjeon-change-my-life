@@ -21,6 +21,7 @@ const STATE = {
     inventory: null, // Inventory 인스턴스 (resetGameState 에서 생성)
     // 각 슬롯: null (빈 칸) 또는 { itemId, count }
     field: null,
+    tileField: null, // TileField 인스턴스 (밭2, resetGameState 에서 생성)
     character: null, // Character 인스턴스 (resetGameState 에서 생성)
     upgrades: {}, // { house: Upgradable, clothes: Upgradable } - resetGameState 에서 채움
     storePopup: null, // 열려있으면 { mode: "buy"|"sell", itemId, count }, 닫혀있으면 null
@@ -53,6 +54,9 @@ function resetGameState() {
 
     //  새 밭 인스턴스 생성
     STATE.field = new Field();
+
+    // 새 타일밭(밭2) 인스턴스 생성 — 전부 풀 상태로 시작
+    STATE.tileField = new TileField();
 
     // 업그레이더블 재산 초기화 (집, 옷 등) — DATA 정의된 모든 재산을 자동으로 등록.
     // TODO 미래: 저장/로드 도입 시 저장된 레벨로 복원.

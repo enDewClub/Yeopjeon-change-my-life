@@ -91,6 +91,8 @@ function renderInventory() {
         rowFrame.appendChild(rowEl);
         bar.appendChild(rowFrame);
     }
+    // 선택 상태가 바뀌었을 수 있으니 손에 든 아이템도 갱신
+    renderHeldItem();
 }
 
 /**
@@ -220,6 +222,102 @@ function renderField() {
         container.appendChild(harvestBtn);
     }
 }
+
+// ═══════════════════════════════════════════════
+// 밭2 렌더링 (타일맵 + 물주기 버튼)
+// 밭2 맵에서만 그림. 타일마다 상태에 따라 바닥/작물 이미지 달라짐.
+// 크기/위치/이미지는 전부 DATA.CONFIG.FIELD2 에서 읽음.
+// ═══════════════════════════════════════════════
+function renderTileField() {
+    // 밭2 맵이 아니면 아무것도 안 그림
+    if (STATE.currentMap !== "field2") return;
+
+    const container = $("map-interactables");
+    container.innerHTML = ""; // 잔여물 제거 (재호출 시 중복 방지)
+
+    const tileField = STATE.tileField;
+    const cfg = DATA.CONFIG.FIELD2;
+
+    // 1. 물주기 버튼 — 원래 밭과 같은 id 재사용
+    //    → CSS / 근접체크 / 디스패처가 그대로 동작 (onWaterClick 이 맵 보고 분기)
+    if (tileField.canWaterAny()) {
+        const waterBtn = document.createElement("button");
+        waterBtn.id = "btn-water";
+        waterBtn.textContent = "물주기";
+        container.appendChild(waterBtn);
+    }
+
+    // 2. 타일 그리드 — 위치/크기는 data 값으로 인라인 설정
+    const gridWidth = cfg.GRID_WIDTH * cfg.TILE_SIZE;
+    const gridHeight = cfg.GRID_HEIGHT * cfg.TILE_SIZE;
+    // GRID_X / GRID_Y 가 null 이면 맵 가운데 자동 정렬
+    const gridX = cfg.GRID_X ?? (DATA.CONFIG.MAP_WIDTH - gridWidth) / 2;
+    const gridY = cfg.GRID_Y ?? (DATA.CONFIG.MAP_HEIGHT - gridHeight) / 2;
+
+    const grid = document.createElement("div");
+    grid.id = "tile-grid";
+    grid.style.left = `${gridX}px`;
+    grid.style.top = `${gridY}px`;
+    grid.style.gridTemplateColumns = `repeat(${cfg.GRID_WIDTH}, ${cfg.TILE_SIZE}px)`;
+    grid.style.gridTemplateRows = `repeat(${cfg.GRID_HEIGHT}, ${cfg.TILE_SIZE}px)`;
+
+    tileField.forEachTile((x, y) => {
+        grid.appendChild(createTileElement(x, y));
+    });
+
+    container.appendChild(grid);
+}
+
+/**
+ * 타일 한 칸을 만들어서 반환한다.
+ * 바닥(풀/흙) 은 background-image, 작물은 위에 겹치는 img.
+ * @param {number} x - 타일 열
+ * @param {number} y - 타일 행
+ * @returns {HTMLElement}
+ */
+function createTileElement(x, y) {
+    const tileField = STATE.tileField;
+    const state = tileField.getTileState(x, y);
+    const { TILE_IMAGES } = DATA.CONFIG.FIELD2;
+
+    const tileEl = document.createElement("div");
+    tileEl.className = `field-tile tile-${state}`; // 예: "field-tile tile-grass"
+    tileEl.dataset.x = x; // 클릭 핸들러에서 활용
+    tileEl.dataset.y = y;
+
+    // 1. 바닥 이미지 — 풀 / 흙 / (자라는 중 + 젖은흙 이미지 있으면) 젖은 흙
+    let groundImage = TILE_IMAGES.dirt;
+    if (state === "grass") {
+        groundImage = TILE_IMAGES.grass;
+    } else if (state === "growing" && TILE_IMAGES.dirtWatered) {
+        groundImage = TILE_IMAGES.dirtWatered;
+    }
+    tileEl.style.backgroundImage = `url("${groundImage}")`;
+
+    // 2. 작물 이미지 — 원래 밭과 같은 growthStages 재사용
+    const stageByState = { planted: "bud", growing: "growing", ready: "ready" };
+    const seedId = tileField.getSeedId(x, y);
+    if (seedId && stageByState[state]) {
+        const cropImg = document.createElement("img");
+        cropImg.className = "field-tile-crop";
+        cropImg.src = DATA.ITEMS[seedId].growthStages[stageByState[state]];
+        cropImg.alt = "";
+        tileEl.appendChild(cropImg);
+    }
+
+    // 3. 지금 캐릭터가 파고 있는 타일이면 표시 (CSS 애니메이션)
+    const character = STATE.character;
+    if (
+        character?.action === "digging" &&
+        character.actionTarget.x === x &&
+        character.actionTarget.y === y
+    ) {
+        tileEl.classList.add("being-dug");
+    }
+
+    return tileEl;
+}
+
 // ═══════════════════════════════════════════════
 // 맵 위 업그레이더블 렌더 (집 등 — renderLocation.mapId 가 있는 것들)
 //
@@ -270,6 +368,50 @@ function renderCharacter() {
 }
 
 // ═══════════════════════════════════════════════
+// 캐릭터 행동 표시 (땅파기 모션 on/off)
+// 행동 시작/끝날 때만 호출 (매 프레임 X).
+//   - #character 에 .digging 클래스 → CSS 흔들림 애니메이션
+//   - DIGGING_IMAGE 가 있으면 베이스 이미지도 교체
+// ═══════════════════════════════════════════════
+function renderCharacterAction() {
+    if (!STATE.character) return;
+
+    const isDigging = STATE.character.action === "digging";
+    $("character").classList.toggle("digging", isDigging);
+
+    const { IMAGE, DIGGING_IMAGE } = DATA.CONFIG.CHARACTER;
+    $("character-base").src =
+        isDigging && DIGGING_IMAGE ? DIGGING_IMAGE : IMAGE;
+}
+
+// ═══════════════════════════════════════════════
+// 손에 든 아이템 표시
+// 선택된 아이템에 heldImage 가 있으면 (도구 등) 캐릭터 손 위치에 표시, 없으면 숨김.
+// 위치/크기/기울기는 DATA.CONFIG.CHARACTER.HELD_ITEM 에서만 관리.
+// 선택이 바뀔 때마다 호출 (renderInventory 끝에서 자동 호출).
+// ═══════════════════════════════════════════════
+function renderHeldItem() {
+    const heldEl = $("character-held-item");
+    const item = STATE.inventory?.getSelectedItem();
+
+    // 선택 없음 / 들 수 없는 아이템 (씨앗 등) → 숨김
+    if (!item?.heldImage) {
+        heldEl.style.display = "none";
+        return;
+    }
+
+    const { X, Y, WIDTH, HEIGHT, ROTATE } = DATA.CONFIG.CHARACTER.HELD_ITEM;
+
+    heldEl.src = item.heldImage;
+    heldEl.style.left = `${X}px`;
+    heldEl.style.top = `${Y}px`;
+    heldEl.style.width = `${WIDTH}px`;
+    heldEl.style.height = `${HEIGHT}px`;
+    heldEl.style.rotate = `${ROTATE}deg`; // transform 대신 rotate 속성 → 땅파기 애니메이션(transform)과 안 겹침
+    heldEl.style.display = "block";
+}
+
+// ═══════════════════════════════════════════════
 // 근접 상호작용 체크 — 매 프레임 호출 (game.js 의 rAF 루프)
 //
 // 거리 계산: 캐릭터 중심점 ↔ 버튼 중심점, Euclidean (√(dx² + dy²)).
@@ -303,8 +445,8 @@ function refreshProximityStates() {
         el.classList.toggle("out-of-range", distance > radius);
     };
 
-    const { EXIT_RADIUS, SPECIAL_RADIUS, FIELD_RADIUS } = DATA.CONFIG.PROXIMITY;
-
+    const { EXIT_RADIUS, SPECIAL_RADIUS, FIELD_RADIUS, TILE_RADIUS } =
+        DATA.CONFIG.PROXIMITY;
     document
         .querySelectorAll(".exit-btn")
         .forEach((el) => check(el, EXIT_RADIUS));
@@ -323,4 +465,9 @@ function refreshProximityStates() {
     document
         .querySelectorAll(".wild-plant")
         .forEach((el) => check(el, FIELD_RADIUS));
+
+    // 밭2 타일 — 반경 밖 타일은 클릭 차단 (CSS 가 hover 강조도 끔)
+    document
+        .querySelectorAll(".field-tile")
+        .forEach((el) => check(el, TILE_RADIUS));
 }

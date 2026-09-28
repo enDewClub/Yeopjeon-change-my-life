@@ -69,7 +69,7 @@ function onTitleStart() {
     renderMap(STATE.currentMap); // STATE.currentMap 는 resetGameState 에서 "home" 으로 설정됨
     renderInventory();
     renderMoney();
-    console.log(STATE.inventory.slotsArray[1].type);
+    //console.log(STATE.inventory.slotsArray[1].type);
 }
 
 // ═══════════════════════════════════════════════
@@ -128,8 +128,21 @@ window.addEventListener("DOMContentLoaded", () => {
 
     /**
      * 물주기 버튼 클릭 → 성장 시작.
+     * 밭2 에서는 심어진 타일 전부 한 번에 물주기 (같은 버튼 id 공유).
      */
     function onWaterClick() {
+        // 밭2 (타일밭)
+        if (STATE.currentMap === "field2") {
+            const wateredCount = STATE.tileField.waterAll();
+            if (wateredCount === 0) return;
+
+            renderTileField();
+            $("message-area").textContent =
+                `${wateredCount}칸에 물을 주었습니다`;
+            return;
+        }
+
+        // 원래 밭
         const success = STATE.field.water();
         if (!success) return; // planted 상태가 아니면 무시
 
@@ -161,6 +174,111 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     // ═══════════════════════════════════════════════
+    // 밭2 (타일밭) 클릭 핸들러들 (디스패처에서 호출)
+    // ═══════════════════════════════════════════════
+
+    /**
+     * 타일 클릭 → 타일 상태 + 선택된 아이템으로 행동 결정.
+     *   ready             → 수확 (뭘 들고 있든)
+     *   grass + 파기 도구  → 땅파기 시작 (DIG_SECONDS 후 흙으로)
+     *   grass + 도구 없음  → 안내 메시지
+     *   dirt  + 씨앗       → 심기
+     *   그 외              → 무시
+     */
+    function onTileClick(x, y) {
+        if (STATE.character.isBusy()) return; // 땅 파는 중엔 다른 행동 X
+
+        const state = STATE.tileField.getTileState(x, y);
+        const selectedItem = STATE.inventory.getSelectedItem();
+
+        if (state === "ready") {
+            onTileHarvest(x, y);
+            return;
+        }
+        if (state === "grass") {
+            // 아이템 ID 대신 toolAction 으로 판단 → 나중에 다른 파기 도구 추가해도 동작
+            if (selectedItem?.toolAction === "dig") {
+                onTileDigStart(x, y);
+            } else {
+                $("message-area").textContent =
+                    "삽을 들어야 땅을 팔 수 있습니다";
+            }
+            return;
+        }
+        if (state === "dirt" && selectedItem?.type === "seed") {
+            onTilePlant(x, y, selectedItem);
+            return;
+        }
+    }
+
+    /**
+     * 땅파기 시작 → 캐릭터 행동 상태로 전환. 실제로 흙이 되는 건 onDigFinished.
+     */
+    function onTileDigStart(x, y) {
+        const started = STATE.character.startDigging(
+            x,
+            y,
+            DATA.CONFIG.FIELD2.DIG_SECONDS,
+        );
+        if (!started) return;
+
+        renderCharacterAction(); // 파는 모션 on
+        renderTileField(); // 파는 중인 타일 표시
+        $("message-area").textContent = "땅을 파는 중...";
+    }
+
+    /**
+     * 땅파기 시간 끝 → 타일을 흙으로. (게임 루프의 updateCharacterAction 에서 호출)
+     */
+    function onDigFinished(x, y) {
+        const success = STATE.tileField.dig(x, y);
+
+        renderCharacterAction(); // 모션 off
+        if (STATE.currentMap === "field2") renderTileField();
+
+        if (!success) return;
+        playSfx("dock");
+        $("message-area").textContent = "땅을 팠습니다. 씨앗을 심을 수 있어요.";
+    }
+
+    /**
+     * 흙 타일에 선택된 씨앗 심기.
+     * 원래 밭과 다르게 선택 유지 → 여러 칸 연속으로 심기 편함. 씨앗 다 쓰면 해제.
+     */
+    function onTilePlant(x, y, seedItem) {
+        const success = STATE.tileField.plant(x, y, seedItem.id);
+        if (!success) return;
+        playSfx("dock");
+
+        STATE.inventory.removeItem(seedItem.id, 1);
+        const remaining = STATE.inventory.getItemCount(seedItem.id);
+        if (remaining === 0) STATE.inventory.deselectSlot();
+
+        renderInventory();
+        renderTileField();
+        $("message-area").textContent =
+            `심기 완료: ${seedItem.displayName} (남은 씨앗 ${remaining}개)`;
+    }
+
+    /**
+     * 다 자란 타일 수확 → 인벤토리에 추가. 타일은 흙으로 돌아감 (바로 재심기 가능).
+     */
+    function onTileHarvest(x, y) {
+        const result = STATE.tileField.harvest(x, y);
+        if (!result) return;
+        playSfx("dock");
+
+        const { cropId, count } = result;
+        STATE.inventory.addItem(cropId, count);
+
+        renderInventory();
+        renderTileField();
+
+        const cropName = DATA.ITEMS[cropId].displayName;
+        $("message-area").textContent = `수확 완료: ${cropName} ${count}개`;
+    }
+
+    // ═══════════════════════════════════════════════
     // 밭 영역 클릭 디스패처 (이벤트 위임)
     // #map-interactables 안의 어떤 요소를 눌렀는지 확인 후 적절한 핸들러로 분기
     // ═══════════════════════════════════════════════
@@ -171,6 +289,13 @@ window.addEventListener("DOMContentLoaded", () => {
             const x = Number(plantEl.dataset.x);
             const y = Number(plantEl.dataset.y);
             onPlantClick(x, y);
+            return;
+        }
+
+        // 밭2 타일 클릭 → 파기 / 심기 / 수확
+        const tileEl = event.target.closest(".field-tile");
+        if (tileEl) {
+            onTileClick(Number(tileEl.dataset.x), Number(tileEl.dataset.y));
             return;
         }
 
@@ -237,8 +362,32 @@ window.addEventListener("DOMContentLoaded", () => {
     // ═══════════════════════════════════════════════
     const pressedKeys = new Set();
     window.addEventListener("keydown", (e) => {
-        pressedKeys.add(e.key.toLowerCase());
+        const key = e.key.toLowerCase();
+        pressedKeys.add(key);
+
+        // 꾹 누르고 있을 때 반복 입력 무시 (한 번 누르면 한 번만)
+        if (e.repeat) return;
+
+        // 물주기 단축키 → 물주기 버튼 클릭과 같은 동작
+        if (key === DATA.CONFIG.KEYS.WATER) onWaterKey();
     });
+
+    /**
+     * 물주기 단축키.
+     * 버튼 클릭과 규칙을 똑같이 맞춤:
+     *   - 버튼이 없으면 (물줄 게 없음 / 밭 맵 아님) → 무시
+     *   - 버튼이 .out-of-range 면 (캐릭터가 멀면) → 무시
+     *   - 땅 파는 중이면 → 무시
+     */
+    function onWaterKey() {
+        if (STATE.currentScene !== "game") return;
+        if (STATE.character?.isBusy()) return;
+
+        const waterBtn = $("btn-water");
+        if (!waterBtn) return;
+
+        onWaterClick();
+    }
     window.addEventListener("keyup", (e) => {
         pressedKeys.delete(e.key.toLowerCase());
     });
@@ -248,6 +397,8 @@ window.addEventListener("DOMContentLoaded", () => {
      * 대각선은 정규화해서 속도 일정 유지 (안 하면 √2 배 빨라짐).
      */
     function updateCharacterFromInput(delta) {
+        if (STATE.character.isBusy()) return; // 땅 파는 중엔 이동 불가
+
         let dx = 0;
         let dy = 0;
         if (pressedKeys.has("arrowleft") || pressedKeys.has("a")) dx -= 1;
@@ -266,6 +417,20 @@ window.addEventListener("DOMContentLoaded", () => {
         STATE.character.move(dx * distance, dy * distance);
     }
 
+    /**
+     * 캐릭터 행동(땅파기 등) 시간이 끝났는지 매 프레임 체크.
+     * 끝났으면 행동 종류별 완료 처리.
+     */
+    function updateCharacterAction() {
+        const finished = STATE.character.finishActionIfDone();
+        if (!finished) return;
+
+        if (finished.action === "digging") {
+            onDigFinished(finished.target.x, finished.target.y);
+        }
+        // 미래: case "watering", "chopping" ...
+    }
+
     // ═══════════════════════════════════════════════
     // 게임 루프 (requestAnimationFrame, ~60fps)
     // - delta 시간 기반 → 프레임 드랍 있어도 속도 일정
@@ -278,6 +443,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (STATE.currentScene === "game" && STATE.character) {
             updateCharacterFromInput(delta);
+            updateCharacterAction(); // 행동 끝났나 체크 (이동보다 먼저)
             renderCharacter();
             refreshProximityStates(); // 매 프레임 버튼 활성/비활성 갱신
         }
@@ -307,5 +473,22 @@ window.addEventListener("DOMContentLoaded", () => {
             const timer = $("field-timer");
             if (timer) timer.textContent = `${field.getRemainingTime()}초`;
         }
+    }, 500);
+
+    // ═══════════════════════════════════════════════
+    // 밭2 성장 틱 (0.5초마다)
+    // - 모든 타일 checkGrowth → 방금 다 자란 타일 있으면 리렌더 + 알림
+    // - 타일별 타이머 숫자는 없음 (타일이 작아서). 젖은 흙 + 성장 이미지가 피드백.
+    // ═══════════════════════════════════════════════
+    setInterval(() => {
+        const tileField = STATE.tileField;
+        if (!tileField) return;
+
+        const justReadyTiles = tileField.checkGrowth();
+        if (justReadyTiles.length === 0) return;
+
+        if (STATE.currentMap === "field2") renderTileField();
+        $("message-area").textContent =
+            `밭2 작물 ${justReadyTiles.length}칸이 다 자랐습니다!`;
     }, 500);
 });

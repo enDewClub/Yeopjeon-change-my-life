@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Icon Size Tester</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: #ffffff;
+                color: #222;
+                font-family: "Segoe UI", sans-serif;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 28px 16px;
+                gap: 20px;
+            }
+
+            h1 {
+                font-size: 12px;
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+                color: #aaa;
+                font-weight: 400;
+            }
+
+            .control-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .control-row .row-label {
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: #aaa;
+                min-width: 100px;
+                text-align: right;
+            }
+
+            .ctrl-btn {
+                height: 32px;
+                padding: 0 14px;
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+                color: #555;
+                font-family: monospace;
+                font-size: 12px;
+                cursor: pointer;
+                border-radius: 6px;
+                transition:
+                    background 0.12s,
+                    color 0.12s,
+                    border-color 0.12s;
+                white-space: nowrap;
+            }
+
+            .ctrl-btn:hover {
+                background: #eaeaea;
+                color: #222;
+                border-color: #bbb;
+            }
+            .ctrl-btn.active {
+                background: #1a56db;
+                color: #fff;
+                border-color: #1a56db;
+            }
+
+            .divider {
+                width: 100%;
+                max-width: 700px;
+                height: 1px;
+                background: #eee;
+            }
+
+            .section-label {
+                font-size: 11px;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: #bbb;
+                text-align: center;
+            }
+
+            .field-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            #field-grid {
+                display: grid;
+                grid-template-columns: repeat(3, var(--field-size, 64px));
+                grid-template-rows: repeat(3, var(--field-size, 64px));
+                gap: 4px;
+            }
+
+            .field-cell {
+                width: var(--field-size, 64px);
+                height: var(--field-size, 64px);
+                background: #f8f8f8;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .field-cell img,
+            .inv-slot img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+            }
+
+            .field-cell .cell-coord {
+                position: absolute;
+                bottom: 2px;
+                right: 3px;
+                font-size: 8px;
+                color: #ccc;
+                font-family: monospace;
+                pointer-events: none;
+            }
+
+            .inventory-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .scroll-x {
+                overflow-x: auto;
+                max-width: 98vw;
+                padding-bottom: 4px;
+            }
+
+            #inventory-bar {
+                display: flex;
+                gap: 4px;
+                flex-wrap: nowrap;
+            }
+
+            .inv-slot {
+                width: var(--inv-size, 64px);
+                height: var(--inv-size, 64px);
+                background: #f8f8f8;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .inv-slot .slot-num {
+                position: absolute;
+                top: 2px;
+                left: 4px;
+                font-size: 8px;
+                color: #ccc;
+                font-family: monospace;
+                pointer-events: none;
+            }
+
+            .size-pill {
+                display: flex;
+                gap: 20px;
+                font-size: 11px;
+                color: #aaa;
+                font-family: monospace;
+            }
+
+            .size-pill span {
+                color: #1a56db;
+                font-weight: 600;
+            }
+
+            .ph-wrap {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .ph-wrap svg {
+                width: 65%;
+                height: 65%;
+                opacity: 0.2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Icon Size Prototype</h1>
+
+        <!-- IMAGE SIZE -->
+        <div class="control-row">
+            <div class="row-label">Image size</div>
+            <button class="ctrl-btn active" data-img="100">img100</button>
+            <button class="ctrl-btn" data-img="128">img128</button>
+            <button class="ctrl-btn" data-img="256">img256</button>
+            <button class="ctrl-btn" data-img="300">img300</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- FIELD SIZE -->
+        <div class="control-row">
+            <div class="row-label">Field size</div>
+            <button class="ctrl-btn" data-field="24">24</button>
+            <button class="ctrl-btn" data-field="48">48</button>
+            <button class="ctrl-btn active" data-field="64">64</button>
+            <button class="ctrl-btn" data-field="96">96</button>
+        </div>
+
+        <!-- mountainGrid 8x6 -->
+        <div class="mountain-wrap">
+            <div class="section-label">mou — 8*6</div>
+            <div id="moutain-grid"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="divider"></div>
+
+        <!-- FIELD SIZE -->
+        <div class="control-row">
+            <div class="row-label">plant size</div>
+            <button class="ctrl-btn" data-gather="24">24</button>
+            <button class="ctrl-btn" data-gather="48">48</button>
+            <button class="ctrl-btn active" data-gather="64">64</button>
+            <button class="ctrl-btn" data-gather="96">96</button>
+        </div>
+
+        <!-- Field 3x3 -->
+        <div class="field-wrap">
+            <div class="section-label">Field — 3 × 3</div>
+            <div id="field-grid"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- INVENTORY SIZE -->
+        <div class="control-row">
+            <div class="row-label">Inventory size</div>
+            <button class="ctrl-btn" data-inv="24">24</button>
+            <button class="ctrl-btn" data-inv="48">48</button>
+            <button class="ctrl-btn active" data-inv="64">64</button>
+            <button class="ctrl-btn" data-inv="96">96</button>
+        </div>
+
+        <!-- Inventory 10 slots -->
+        <div class="inventory-wrap">
+            <div class="section-label">Inventory — 10 slots</div>
+            <div class="scroll-x">
+                <div id="inventory-bar"></div>
+            </div>
+        </div>
+
+        <!-- Readout -->
+        <div class="size-pill">
+            <div>Image: <span id="out-img">img100</span></div>
+            <div>Field slot: <span id="out-field">64 × 64</span></div>
+            <div>Inventory slot: <span id="out-inv">64 × 64</span></div>
+        </div>
+
+        <script>
+            // ── Swap these paths to your actual image files ──────────────
+            const FIELD_IMG_PATHS = {
+                100: "field_img100.png",
+                300: "field_img300.png",
+                500: "field_img500.png",
+            };
+
+            const INV_IMG_PATHS = {
+                100: "inv_img100.png",
+                300: "inv_img300.png",
+                128: "inv_img128.png",
+                256: "inv_img256.png",
+            };
+            // ─────────────────────────────────────────────────────────────
+
+            let currentImg = 300;
+            let currentField = 64;
+            let currentInv = 64;
+
+            const fieldGrid = document.getElementById("field-grid");
+            const invBar = document.getElementById("inventory-bar");
+
+            function phSVG() {
+                return `<div class="ph-wrap"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="40" height="40" rx="5" fill="none" stroke="#999" stroke-width="1.5"/>
+      <line x1="4" y1="4" x2="44" y2="44" stroke="#ccc" stroke-width="1"/>
+      <line x1="44" y1="4" x2="4" y2="44" stroke="#ccc" stroke-width="1"/>
+    </svg></div>`;
+            }
+
+            function makeImgField() {
+                const img = document.createElement("img");
+                img.src = FIELD_IMG_PATHS[currentImg];
+                img.alt = "";
+                img.onerror = function () {
+                    this.style.display = "none";
+                    if (!this.parentNode.querySelector(".ph-wrap")) {
+                        const d = document.createElement("div");
+                        d.innerHTML = phSVG();
+                        this.parentNode.appendChild(d.firstChild);
+                    }
+                };
+                return img;
+            }
+            function makeImgMountain() {
+                const img = document.createElement("img");
+                img.src = FIELD_IMG_PATHS[currentImg];
+                img.alt = "";
+                img.onerror = function () {
+                    this.style.display = "none";
+                    if (!this.parentNode.querySelector(".ph-wrap")) {
+                        const d = document.createElement("div");
+                        d.innerHTML = phSVG();
+                        this.parentNode.appendChild(d.firstChild);
+                    }
+                };
+                return img;
+            }
+            function makeImgInv() {
+                const img = document.createElement("img");
+                img.src = INV_IMG_PATHS[currentImg];
+                img.alt = "";
+                img.onerror = function () {
+                    this.style.display = "none";
+                    if (!this.parentNode.querySelector(".ph-wrap")) {
+                        const d = document.createElement("div");
+                        d.innerHTML = phSVG();
+                        this.parentNode.appendChild(d.firstChild);
+                    }
+                };
+                return img;
+            }
+
+            function buildField() {
+                fieldGrid.innerHTML = "";
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 3; c++) {
+                        const cell = document.createElement("div");
+                        cell.className = "field-cell";
+                        cell.appendChild(makeImgField());
+                        const coord = document.createElement("div");
+                        coord.className = "cell-coord";
+                        coord.textContent = `${r + 1},${c + 1}`;
+                        cell.appendChild(coord);
+                        fieldGrid.appendChild(cell);
+                    }
+                }
+            }
+            function buildMountain() {
+                mountainGrid.innerHTML = "";
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 3; c++) {
+                        const cell = document.createElement("div");
+                        cell.className = "mountain-cell";
+                        cell.appendChild(makeImgMountain());
+                        const coord = document.createElement("div");
+                        coord.className = "cell-coord";
+                        coord.textContent = `${r + 1},${c + 1}`;
+                        cell.appendChild(coord);
+                        mountainGrid.appendChild(cell);
+                    }
+                }
+            }
+
+            function buildInventory() {
+                invBar.innerHTML = "";
+                for (let i = 0; i < 10; i++) {
+                    const slot = document.createElement("div");
+                    slot.className = "inv-slot";
+                    const num = document.createElement("div");
+                    num.className = "slot-num";
+                    num.textContent = i + 1;
+                    slot.appendChild(num);
+                    slot.appendChild(makeImgInv());
+                    invBar.appendChild(slot);
+                }
+            }
+
+            function refreshImages() {
+                document.querySelectorAll(".field-cell").forEach((cell) => {
+                    const img = cell.querySelector("img");
+                    const ph = cell.querySelector(".ph-wrap");
+                    if (img) {
+                        img.style.display = "";
+                        img.src = FIELD_IMG_PATHS[currentImg];
+                    }
+                    if (ph) ph.remove();
+                });
+                document.querySelectorAll(".inv-slot").forEach((cell) => {
+                    const img = cell.querySelector("img");
+                    const ph = cell.querySelector(".ph-wrap");
+                    if (img) {
+                        img.style.display = "";
+                        img.src = INV_IMG_PATHS[currentImg];
+                    }
+                    if (ph) ph.remove();
+                });
+            }
+
+            function applyFieldSize(size) {
+                currentField = size;
+                document.documentElement.style.setProperty(
+                    "--field-size",
+                    size + "px",
+                );
+                document.getElementById("out-field").textContent =
+                    size + " × " + size;
+                document
+                    .querySelectorAll("[data-field]")
+                    .forEach((b) =>
+                        b.classList.toggle(
+                            "active",
+                            parseInt(b.dataset.field) === size,
+                        ),
+                    );
+            }
+            function applyMountainSize(size) {
+                currentMountain = size;
+                document.documentElement.style.setProperty(
+                    "--mountain-size",
+                    size + "px",
+                );
+                document.getElementById("out-mountain").textContent =
+                    size + " × " + size;
+                document
+                    .querySelectorAll("[data-mountain]")
+                    .forEach((b) =>
+                        b.classList.toggle(
+                            "active",
+                            parseInt(b.dataset.mountain) === size,
+                        ),
+                    );
+            }
+
+            function applyInvSize(size) {
+                currentInv = size;
+                document.documentElement.style.setProperty(
+                    "--inv-size",
+                    size + "px",
+                );
+                document.getElementById("out-inv").textContent =
+                    size + " × " + size;
+                document
+                    .querySelectorAll("[data-inv]")
+                    .forEach((b) =>
+                        b.classList.toggle(
+                            "active",
+                            parseInt(b.dataset.inv) === size,
+                        ),
+                    );
+            }
+
+            function applyImgSize(size) {
+                currentImg = size;
+                document.getElementById("out-img").textContent = "img" + size;
+                document
+                    .querySelectorAll("[data-img]")
+                    .forEach((b) =>
+                        b.classList.toggle(
+                            "active",
+                            parseInt(b.dataset.img) === size,
+                        ),
+                    );
+                refreshImages();
+            }
+
+            document
+                .querySelectorAll("[data-field]")
+                .forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        applyFieldSize(parseInt(btn.dataset.field)),
+                    ),
+                );
+
+            document
+                .querySelectorAll("[data-mountain]")
+                .forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        applyMountainSize(parseInt(btn.dataset.mountain)),
+                    ),
+                );
+
+            document
+                .querySelectorAll("[data-inv]")
+                .forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        applyInvSize(parseInt(btn.dataset.inv)),
+                    ),
+                );
+
+            document
+                .querySelectorAll("[data-img]")
+                .forEach((btn) =>
+                    btn.addEventListener("click", () =>
+                        applyImgSize(parseInt(btn.dataset.img)),
+                    ),
+                );
+
+            buildField();
+            buildInventory();
+            buildMountain();
+            applyFieldSize(64);
+            applyInvSize(64);
+            applyMountainSize(96);
+            applyImgSize(300);
+        </script>
+    </body>
+</html>

@@ -17,6 +17,12 @@ class Character {
     constructor() {
         this.x = 0;
         this.y = 0;
+
+        // 행동 상태 — 이동이 아닌 "뭔가 하는 중" (땅파기 등)
+        // idle 이 아니면 이동 불가 (game.js 의 입력 처리에서 막음)
+        this.action = "idle"; // "idle" | "digging"
+        this.actionEndTime = null; // 행동 끝나는 timestamp
+        this.actionTarget = null; // 행동 대상 (땅파기면 { x, y } 타일 좌표)
     }
 
     /**
@@ -40,6 +46,50 @@ class Character {
 
         this.x = Math.max(0, Math.min(maxX, this.x + dx));
         this.y = Math.max(0, Math.min(maxY, this.y + dy));
+    }
+
+    // ─────────────────────────────────────────
+    // 행동 (땅파기 등) — 시간 걸리는 행동
+    // Character 는 "뭘 언제까지 하는지" 만 기억.
+    // 끝났을 때 실제 효과(타일 → 흙)는 호출자(game.js)가 처리.
+    // ─────────────────────────────────────────
+
+    /** @returns {boolean} 지금 뭔가 하는 중? (이동/다른 행동 막을 때 사용) */
+    isBusy() {
+        return this.action !== "idle";
+    }
+
+    /**
+     * 땅파기 시작. 이미 다른 행동 중이면 실패.
+     * @param {number} tileX - 팔 타일 x
+     * @param {number} tileY - 팔 타일 y
+     * @param {number} durationSeconds - 걸리는 시간 (DATA.CONFIG.FIELD2.DIG_SECONDS)
+     * @returns {boolean} 성공 여부
+     */
+    startDigging(tileX, tileY, durationSeconds) {
+        if (this.isBusy()) return false;
+
+        this.action = "digging";
+        this.actionEndTime = Date.now() + durationSeconds * 1000;
+        this.actionTarget = { x: tileX, y: tileY };
+        return true;
+    }
+
+    /**
+     * 행동 시간이 끝났으면 idle 로 되돌리고 끝난 행동 정보를 반환.
+     * 게임 루프에서 매 프레임 호출.
+     * @returns {{action: string, target: object} | null} 방금 끝났으면 정보, 아니면 null
+     */
+    finishActionIfDone() {
+        if (!this.isBusy()) return null;
+        if (Date.now() < this.actionEndTime) return null;
+
+        const finished = { action: this.action, target: this.actionTarget };
+
+        this.action = "idle";
+        this.actionEndTime = null;
+        this.actionTarget = null;
+        return finished;
     }
 
     // ─────────────────────────────────────────
