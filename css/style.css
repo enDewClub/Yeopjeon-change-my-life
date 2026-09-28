@@ -1005,3 +1005,102 @@ body {
     opacity: 0.4;
     pointer-events: none;
 }
+
+/* ═══════════════════════════════════════════════
+   밭2 - 타일맵 밭
+   #tile-grid 의 left / top / grid-template 은 ui.js 가
+   DATA.CONFIG.FIELD2 값으로 인라인 설정 (크기 바꿔도 CSS 수정 X)
+   ═══════════════════════════════════════════════ */
+#tile-grid {
+    position: absolute;
+    display: grid;
+    gap: 0; /* 타일끼리 딱 붙어야 한 장의 땅처럼 보임 */
+}
+
+.field-tile {
+    position: relative;
+    background-size: 100% 100%;
+    image-rendering: pixelated; /* 픽셀아트 확대 시 흐려지지 않게 */
+    cursor: pointer;
+}
+
+/* 마우스 올린 타일 강조 (근접 범위 안일 때만 — 아래 .out-of-range 가 막음) */
+.field-tile:hover {
+    outline: 1px solid rgba(255, 255, 255, 0.85);
+    outline-offset: -2px;
+    z-index: 1;
+}
+
+/* 타일 위 작물 이미지 */
+.field-tile-crop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* 지금 파고 있는 타일 — 깜빡임 */
+.field-tile.being-dug {
+    animation: tile-being-dug 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes tile-being-dug {
+    from {
+        filter: brightness(1);
+    }
+    to {
+        filter: brightness(0.7);
+    }
+}
+
+/* 캐릭터가 멀면 클릭 차단. 
+   다른 버튼들과 달리 흐리게는 안 함 (128칸이 다 흐려지면 밭 전체가 어두워 보임) */
+.field-tile.out-of-range {
+    pointer-events: none;
+    cursor: default;
+}
+
+/* ═══════════════════════════════════════════════
+   캐릭터 땅파기 모션
+   #character 자체는 transform 으로 위치 잡으므로 (renderCharacter),
+   애니메이션은 자식 레이어에 걸어야 위치가 안 튐.
+   ═══════════════════════════════════════════════ */
+#character.digging .character-layer {
+    animation: character-digging 0.12s ease-in-out infinite alternate;
+}
+
+/* @keyframes character-digging {
+    from {
+        transform: translateY(0) rotate(-3deg);
+    }
+    to {
+        transform: translateY(1px) rotate(3deg);
+    }
+} */
+
+/* ═══════════════════════════════════════════════
+   손에 든 아이템 — 캐릭터 박스 안 절대 위치
+   left / top / 크기 / 기울기는 ui.js 가 DATA.CONFIG.CHARACTER.HELD_ITEM 으로 인라인 설정
+   ═══════════════════════════════════════════════ */
+#character-held-item {
+    position: absolute;
+    display: none; /* 기본 숨김 — 도구 선택 시에만 보임 */
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* 땅파기 중엔 삽도 같이 흔들림 (삽질 느낌) */
+#character.digging #character-held-item {
+    animation: held-item-digging 0.1s ease-in-out infinite alternate;
+}
+
+/* 땅파기 중엔 삽을 거꾸로 (날이 땅을 향하게) */
+#character.digging #character-held-item {
+    transform: rotate(180deg);
+}

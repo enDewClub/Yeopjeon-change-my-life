@@ -22,7 +22,8 @@ class Field {
     // ─────────────────────────────────────────
     // 생성자
     // ─────────────────────────────────────────
-    constructor() {
+    constructor(config = DATA.CONFIG.FIELD) {
+        this.config = config; // 설정값 (GROW_TIME_SECONDS, HARVEST_MIN, HARVEST_MAX)
         this.state = "empty"; // "empty" | "planted" | "growing" | "ready"
         this.seedId = null; // 심긴 씨앗 ID (empty 일 땐 null)
         this.growEndTime = null; // 자람 완료 timestamp (growing 일 때만)
@@ -84,7 +85,7 @@ class Field {
 
         // 작물 ID 와 랜덤 수확량 결정
         const cropId = DATA.ITEMS[this.seedId].growsInto;
-        const { HARVEST_MIN, HARVEST_MAX } = DATA.CONFIG.FIELD;
+        const { HARVEST_MIN, HARVEST_MAX } = this.config; //DATA.CONFIG.FIELD;
         const count =
             Math.floor(Math.random() * (HARVEST_MAX - HARVEST_MIN + 1)) +
             HARVEST_MIN;

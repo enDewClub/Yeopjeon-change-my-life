@@ -40,6 +40,7 @@ function defineItems({
     crops = {},
     wildPlants = {},
     consumables = {},
+    tools = {},
     folder = "farm",
 }) {
     const items = {};
@@ -96,6 +97,20 @@ function defineItems({
         };
     }
 
+    // ─── 도구 처리 ──────────────────────────
+    // 소모되지 않는 아이템 (삽 등). 수량 1 로 들고 다니며 계속 사용.
+    // toolAction 으로 어떤 행동을 하는지 결정 → 코드에서 아이템 ID 대신 이걸로 분기.
+    //   (나중에 호미/괭이 추가 시 toolAction 만 다르게 주면 됨)
+    for (const [id, def] of Object.entries(tools)) {
+        items[id] = {
+            id,
+            type: "tool",
+            heldImage: path(id), // 손에 들었을 때 이미지 (기본: 아이콘 재사용). 전용 이미지 있으면 def 에서 덮어쓰기
+            icon: path(id),
+            ...def,
+        };
+    }
+
     return items;
 }
 
@@ -138,9 +153,10 @@ const DATA = {
         STARTING_MAP: "home", // 게임 시작 시 진입할 맵
         // 시작 시 인벤토리에 넣어줄 아이템들 (테스트 + Step 1 시작 자원)
         STARTING_INVENTORY: [
-            // { itemId: "potato_seed", count: 3 },
-            // { itemId: "garlic_seed", count: 2 },
-            // { itemId: "tomato_seed", count: 1 },
+            { itemId: "shovel", count: 1 },
+            { itemId: "potato_seed", count: 30 },
+            { itemId: "garlic_seed", count: 30 },
+            { itemId: "tomato_seed", count: 30 },
         ],
         // 밭 설정값
         FIELD: {
@@ -149,6 +165,26 @@ const DATA = {
             HARVEST_MIN: 1, // 수확량 최소
             HARVEST_MAX: 9, // 수확량 최대
         },
+        // 밭2 (타일맵 밭) 설정값
+        // 크기/이미지 바꾸고 싶으면 여기만 수정. 코드 수정 X.
+        // GROW_TIME_SECONDS / HARVEST_MIN / HARVEST_MAX 는 FIELD 와 같은 키 이름 유지
+        //   (Field 클래스를 타일마다 재사용하기 때문)
+        FIELD2: {
+            GRID_WIDTH: 16, // 가로 타일 수
+            GRID_HEIGHT: 8, // 세로 타일 수
+            TILE_SIZE: 48, // 타일 화면 크기(px). 원본 픽셀의 정수배 권장 (16px 원본 → 32/48)
+            GRID_X: null, // 그리드 좌상단 x (px). null 이면 맵 가로 가운데 자동 정렬
+            GRID_Y: null, // 그리드 좌상단 y (px). null 이면 맵 세로 가운데 자동 정렬
+            DIG_SECONDS: 0.5, // 땅 한 칸 파는 시간 (이동 불가)
+            GROW_TIME_SECONDS: 5, // 자라는 데 걸리는 시간
+            HARVEST_MIN: 1, // 타일 하나당 수확량 최소
+            HARVEST_MAX: 3, // 타일 하나당 수확량 최대
+            TILE_IMAGES: {
+                grass: "img_assets/tiles/grass.png", // 기본 풀
+                dirt: "img_assets/tiles/dirt.png", // 파놓은 흙
+                dirtWatered: "img_assets/tiles/dirt_watered.png", // 물 준 흙 (없으면 null)
+            },
+        },
         // 맵 영역 크기 (tokens.css 의 --canvas-width/height 와 동일 유지)
         MAP_WIDTH: 960,
         MAP_HEIGHT: 540,
@@ -156,9 +192,24 @@ const DATA = {
         // 캐릭터 설정값
         CHARACTER: {
             WIDTH: 500 / 3, // 화면 표시 너비 (원본 500x600 비율 무시, 정사각 표시)
-            HEIGHT: 600 / 3, // 화면 표시 높이
+            HEIGHT: 500 / 3, // 화면 표시 높이
             SPEED: 400, // 이동 속도 (픽셀/초). 숫자 키우면 빨라짐.
-            IMAGE: "img_assets/characters/player_character_shade.png",
+            IMAGE: "img_assets/characters/player_character_48.png",
+
+            DIGGING_IMAGE: null, // 땅파기 중 베이스 이미지. null 이면 이미지 교체 없이 흔들림만
+            // 손에 든 아이템 위치 (캐릭터 박스 좌상단 기준 px)
+            // 캐릭터 박스 크기 = WIDTH x HEIGHT. 스프라이트의 손 위치에 맞게 숫자만 조정.
+            HELD_ITEM: {
+                X: -10, // 박스 왼쪽에서부터
+                Y: 70, // 박스 위쪽에서부터
+                WIDTH: 60, // 표시 크기
+                HEIGHT: 60,
+                ROTATE: -20, // 기울기 (도). 0 = 아이콘 그대로
+            },
+        },
+        // 키보드 단축키 (소문자로 적기)
+        KEYS: {
+            WATER: "k", // 물주기 (물주기 버튼과 같은 동작)
         },
 
         // 근접 상호작용 거리 설정 (캐릭터 중심점 ↔ 버튼 중심점, Euclidean 거리, 픽셀)
@@ -168,6 +219,8 @@ const DATA = {
             EXIT_RADIUS: 120, // 출구 버튼 (.exit-btn)
             SPECIAL_RADIUS: 120, // 특수 액션 버튼 (입궁하기, 상점 들어가기)
             FIELD_RADIUS: 150, // 밭 관련 (셀, 물주기, 수확하기)
+
+            TILE_RADIUS: 110, // 밭2 타일 (.field-tile) — 타일이 작아서 조금 좁게
         },
 
         STORE_INVENTORY: [
@@ -220,6 +273,7 @@ const DATA = {
             exits: {
                 left: "village", // 왼쪽 → 마을
                 right: "field", // 오른쪽 → 밭
+                bottom: "field2", // 아래쪽 → 밭2 (타일밭)
             },
         },
 
@@ -255,7 +309,7 @@ const DATA = {
                 // 새 조건 추가 = 객체 하나 더 푸시 — 다른 코드 수정 없음.
                 // TODO Stage 2: 옷 조건 추가 시 { upgradableId: "clothes", minLevel: 3 } 한 줄 추가
                 requires: [
-                    { upgradableId: "house", minLevel: 2 },
+                    { upgradableId: "house", minLevel: 1 },
                     { upgradableId: "clothes", minLevel: 1 },
                 ],
                 lockedLabel: "입궁 자격 부족",
@@ -269,6 +323,15 @@ const DATA = {
             characterStart: { x: 440, y: 60 }, // 상단 출구 근처 (집터에서 진입한 느낌).
             exits: {
                 top: "home", // 위쪽 → 집터 (밭에서 나가기)
+            },
+        },
+        // 밭2 - 타일맵 밭 (삽으로 파고 → 심고 → 물주고 → 수확)
+        field2: {
+            displayName: "새 밭",
+            bgImage: "img_assets/bg/map_field_topdown.png",
+            characterStart: { x: 440, y: 0 }, // 상단 출구 근처 (집터 아래에서 내려온 느낌)
+            exits: {
+                top: "home", // 위쪽 → 집터
             },
         },
 
@@ -533,6 +596,20 @@ const DATA = {
                 },
             },
             folder: "gathering",
+        }),
+
+        // 도구: img_assets/items/tools/
+        // sellPrice / buyPrice 없음 → 상점에서 사고팔 수 없음
+        ...defineItems({
+            tools: {
+                shovel: {
+                    displayName: "삽",
+                    description:
+                        "풀밭을 파서 씨앗을 심을 수 있는 흙으로 만듭니다.",
+                    toolAction: "dig",
+                },
+            },
+            folder: "tools",
         }),
     },
 };
